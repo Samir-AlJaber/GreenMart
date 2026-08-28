@@ -1,0 +1,418 @@
+.profile-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(6,78,59,.35);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+
+    .profile-modal.active {
+        display: flex;
+        animation: modalFade .3s ease;
+    }
+
+
+.profile-modal-box {
+    width: 90%;
+    max-width: 520px;
+    background: linear-gradient( 145deg, #ffffff, #f0fdf4 );
+    border-radius: 35px;
+    padding: 40px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.25);
+    animation: modalShow .35s ease;
+}
+
+
+
+    .profile-modal-box h2 {
+        text-align: center;
+        color: #064e3b;
+        font-size: 32px;
+        font-weight: 900;
+        margin-bottom: 30px;
+    }
+
+
+
+    .profile-modal-box label {
+        display: block;
+        color: #064e3b;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+
+
+.profile-input {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 20px;
+    border: 1px solid #86efac;
+    outline: none;
+    margin-bottom: 20px;
+    font-size: 15px;
+    transition: .3s ease;
+}
+
+
+
+    .profile-input:focus {
+        border-color: #16a34a;
+        box-shadow: 0 0 20px rgba(22,163,74,.25);
+    }
+
+
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+
+
+.modal-cancel,
+.modal-update {
+    padding: 14px 35px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-weight: 800;
+    transition: .35s ease;
+}
+
+
+
+.modal-cancel {
+    background: #dcfce7;
+    color: #065f46;
+}
+
+
+
+.modal-update {
+    background: linear-gradient( 135deg, #16a34a, #059669 );
+    color: white;
+}
+
+
+
+.modal-cancel:hover {
+    transform: translateY(-5px);
+    background: #bbf7d0;
+}
+
+
+
+.modal-update:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(22,163,74,.35);
+}
+
+
+
+.profile-success {
+    max-width: 500px;
+    margin: 25px auto;
+    padding: 15px;
+    border-radius: 20px;
+    background: #16a34a;
+    color: white;
+    text-align: center;
+    font-weight: 800;
+    animation: successShow .5s ease;
+}
+
+
+
+.profile-error {
+    max-width: 500px;
+    margin: 25px auto;
+    padding: 15px;
+    border-radius: 20px;
+    background: #dc2626;
+    color: white;
+    text-align: center;
+    font-weight: 800;
+}
+
+
+
+@keyframes modalFade {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+
+@keyframes modalShow {
+
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(.9);
+    }
+
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+
+@keyframes successShow {
+
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+@media(max-width:600px) {
+
+    .profile-modal-box {
+        padding: 25px;
+    }
+
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+
+    .modal-update,
+    .modal-cancel {
+        width: 100%;
+    }
+}
+
+.confirm-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(6,78,59,.45);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+
+
+    .confirm-modal.active {
+        display: flex;
+        animation: modalFade .3s ease;
+    }
+
+
+
+.confirm-box {
+    width: 90%;
+    max-width: 450px;
+    background: linear-gradient( 145deg, #ffffff, #ecfdf5 );
+    border-radius: 30px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,.25);
+    animation: modalShow .35s ease;
+}
+
+
+
+.warning-icon {
+    width: 60px;
+    height: 60px;
+    margin: auto;
+    border-radius: 50%;
+    background: #facc15;
+    color: white;
+    font-size: 40px;
+    font-weight: 900;
+}
+
+
+
+.confirm-box h2 {
+    color: #064e3b;
+    margin-top: 20px;
+    font-weight: 900;
+}
+
+
+
+.confirm-box p {
+    color: #475569;
+}
+
+
+
+.confirm-box ul {
+    text-align: left;
+    color: #64748b;
+    margin: 20px 0;
+}
+
+
+
+.confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+
+
+.confirm-cancel,
+.confirm-save {
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-weight: 800;
+    transition: .35s ease;
+}
+
+
+
+.confirm-cancel {
+    background: #dcfce7;
+    color: #065f46;
+}
+
+
+
+.confirm-save {
+    background: linear-gradient( 135deg, #16a34a, #059669 );
+    color: white;
+}
+
+
+
+.confirm-cancel:hover {
+    transform: translateY(-5px);
+    background: #bbf7d0;
+}
+
+
+
+.confirm-save:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(22,163,74,.3);
+}
+
+
+
+@media(max-width:600px) {
+
+    .confirm-buttons {
+        flex-direction: column;
+    }
+
+
+    .confirm-save,
+    .confirm-cancel {
+        width: 100%;
+    }
+}
+
+.profile-action-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+
+.password-btn {
+    background: linear-gradient( 135deg, #059669, #0d9488 );
+}
+
+
+
+    .password-btn:hover {
+        transform: translateY(-5px) scale(1.03);
+        box-shadow: 0 15px 35px rgba(5,150,105,.35);
+    }
+
+
+
+#passwordModal .profile-modal-box {
+    animation: modalShow .35s ease;
+}
+
+
+
+#passwordConfirmModal .confirm-box {
+    animation: modalShow .35s ease;
+}
+
+
+
+#passwordModal .profile-input {
+    background: white;
+}
+
+
+
+#passwordModal h2 {
+    color: #064e3b;
+}
+
+
+
+#passwordConfirmModal .warning-icon {
+    background: linear-gradient( 135deg, #facc15, #f59e0b );
+}
+
+
+
+#passwordConfirmModal .confirm-save {
+    background: linear-gradient( 135deg, #16a34a, #059669 );
+}
+
+
+
+    #passwordConfirmModal .confirm-save:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 15px 35px rgba(22,163,74,.35);
+    }
+
+
+
+#passwordConfirmModal .confirm-cancel:hover {
+    transform: translateY(-5px);
+    background: #bbf7d0;
+}
+
+
+
+@media(max-width:600px) {
+
+    .profile-action-buttons {
+        flex-direction: column;
+    }
+
+
+        .profile-action-buttons .profile-btn {
+            width: 100%;
+        }
+}

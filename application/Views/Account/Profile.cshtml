@@ -1,0 +1,603 @@
+@model GreenMart.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+
+<div class="profile-page">
+
+    <div class="profile-container">
+
+
+        <div class="profile-header">
+
+            <div class="profile-avatar">
+                @Model.FullName.Substring(0, 1).ToUpper()
+            </div>
+
+
+            <h1>
+                @Model.FullName
+            </h1>
+
+
+            <p>
+                @Model.Email
+            </p>
+
+        </div>
+
+
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="profile-success"
+                 id="successMessage">
+
+                @TempData["SuccessMessage"]
+
+            </div>
+        }
+
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="profile-error"
+                 id="errorMessage">
+
+                @TempData["ErrorMessage"]
+
+            </div>
+        }
+
+
+
+
+        <div class="profile-grid">
+
+
+            <div class="profile-card">
+
+
+                <h2>
+                    Profile Information
+                </h2>
+
+
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+                        Full Name
+                    </span>
+
+
+                    <span class="profile-value">
+                        @Model.FullName
+                    </span>
+
+                </div>
+
+
+
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+                        Email
+                    </span>
+
+
+                    <span class="profile-value">
+                        @Model.Email
+                    </span>
+
+                </div>
+
+
+
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+                        Phone Number
+                    </span>
+
+
+                    <span class="profile-value">
+
+                        @(string.IsNullOrEmpty(Model.PhoneNumber)
+                        ? "Not Added"
+                        : Model.PhoneNumber)
+
+                    </span>
+
+                </div>
+
+
+
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+                        Address
+                    </span>
+
+
+                    <span class="profile-value">
+
+                        @(string.IsNullOrEmpty(Model.Address)
+                        ? "Not Added"
+                        : Model.Address)
+
+                    </span>
+
+                </div>
+
+
+
+
+                <div class="profile-action-buttons">
+
+
+                    <button class="profile-btn"
+                            onclick="openProfileModal()">
+
+                        Update Profile
+
+                    </button>
+
+
+
+                    <button class="profile-btn password-btn"
+                            onclick="openPasswordModal()">
+
+                        Change Password
+
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+
+
+
+
+            <div class="profile-card">
+
+
+                <h2>
+                    Account Information
+                </h2>
+
+
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+                        Role
+                    </span>
+
+
+                    <span class="profile-value">
+                        @Model.Role
+                    </span>
+
+                </div>
+
+
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+                        Joined
+                    </span>
+
+
+                    <span class="profile-value">
+
+                        @Model.CreatedAt.ToString("dd MMM yyyy")
+
+                    </span>
+
+                </div>
+
+
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+                        Status
+                    </span>
+
+
+                    <span class="profile-value">
+
+                        @(Model.IsActive ? "Active" : "Inactive")
+
+                    </span>
+
+                </div>
+
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+<div class="profile-modal"
+     id="profileModal">
+
+
+    <div class="profile-modal-box">
+
+
+        <h2>
+            Update Profile
+        </h2>
+
+
+
+        <form id="updateProfileForm"
+              asp-controller="Account"
+              asp-action="UpdateProfile"
+              method="post">
+
+
+
+            <label>
+                Full Name
+            </label>
+
+
+            <input class="profile-input"
+                   name="FullName"
+                   value="@Model.FullName" />
+
+
+
+
+            <label>
+                Email
+            </label>
+
+
+            <input class="profile-input"
+                   name="Email"
+                   value="@Model.Email" />
+
+
+
+
+            <label>
+                Phone Number
+            </label>
+
+
+            <input class="profile-input"
+                   name="PhoneNumber"
+                   value="@Model.PhoneNumber" />
+
+
+
+
+            <label>
+                Address
+            </label>
+
+
+            <input class="profile-input"
+                   name="Address"
+                   value="@Model.Address" />
+
+
+
+
+            <div class="modal-buttons">
+
+
+                <button type="button"
+                        class="modal-cancel"
+                        onclick="closeProfileModal()">
+
+                    Cancel
+
+                </button>
+
+
+
+                <button type="button"
+                        class="modal-update"
+                        onclick="openConfirmModal()">
+
+                    Update
+
+                </button>
+
+
+            </div>
+
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<div class="confirm-modal"
+     id="confirmModal">
+
+
+    <div class="confirm-box">
+
+
+        <div class="warning-icon">
+            !
+        </div>
+
+
+
+        <h2>
+            Confirm Changes
+        </h2>
+
+
+
+        <p>
+            Are you sure you want to save these changes?
+        </p>
+
+
+
+        <ul>
+
+            <li>
+                Your profile information will be updated.
+            </li>
+
+
+            <li>
+                Email changes may affect future login access.
+            </li>
+
+
+            <li>
+                These changes will be saved permanently.
+            </li>
+
+        </ul>
+
+
+
+
+        <div class="confirm-buttons">
+
+
+            <button type="button"
+                    class="confirm-cancel"
+                    onclick="closeConfirmModal()">
+
+                Cancel
+
+            </button>
+
+
+
+            <button type="button"
+                    class="confirm-save"
+                    onclick="submitProfileUpdate()">
+
+                Confirm Update
+
+            </button>
+
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="profile-modal"
+     id="passwordModal">
+
+
+    <div class="profile-modal-box">
+
+
+        <h2>
+            Change Password
+        </h2>
+
+
+
+        <form id="passwordForm"
+              asp-controller="Account"
+              asp-action="UpdatePassword"
+              method="post">
+
+
+            <label>
+                Current Password
+            </label>
+
+
+            <input class="profile-input"
+                   type="password"
+                   name="CurrentPassword"
+                   placeholder="Enter current password" />
+
+
+
+
+            <label>
+                New Password
+            </label>
+
+
+            <input class="profile-input"
+                   type="password"
+                   name="NewPassword"
+                   placeholder="Enter new password" />
+
+
+
+
+            <label>
+                Confirm New Password
+            </label>
+
+
+            <input class="profile-input"
+                   type="password"
+                   name="ConfirmPassword"
+                   placeholder="Confirm new password" />
+
+
+
+
+            <div class="modal-buttons">
+
+
+                <button type="button"
+                        class="modal-cancel"
+                        onclick="closePasswordModal()">
+
+                    Cancel
+
+                </button>
+
+
+
+                <button type="button"
+                        class="modal-update"
+                        onclick="openPasswordConfirmModal()">
+
+                    Update Password
+
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="confirm-modal"
+     id="passwordConfirmModal">
+
+
+    <div class="confirm-box">
+
+
+        <div class="warning-icon">
+            !
+        </div>
+
+
+
+        <h2>
+            Confirm Password Change
+        </h2>
+
+
+
+        <p>
+            Are you sure you want to change your password?
+        </p>
+
+
+
+        <ul>
+
+            <li>
+                Your current session will end.
+            </li>
+
+
+            <li>
+                You need to login again.
+            </li>
+
+
+            <li>
+                Your old password will stop working.
+            </li>
+
+        </ul>
+
+
+
+
+        <div class="confirm-buttons">
+
+
+            <button type="button"
+                    class="confirm-cancel"
+                    onclick="closePasswordConfirmModal()">
+
+                Cancel
+
+            </button>
+
+
+
+            <button type="button"
+                    class="confirm-save"
+                    onclick="submitPasswordUpdate()">
+
+                Confirm Change
+
+            </button>
+
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
