@@ -1,0 +1,125 @@
+@model GreenMart.Models.LoginModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<section class="login-section">
+
+    <div class="login-card">
+
+        <div class="login-header">
+            <h1>Welcome Back</h1>
+            <p>Login to continue your GreenMart journey</p>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="success-message" id="successMessage">
+                ✅ @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <form method="post" asp-action="Login" novalidate>
+
+            <div asp-validation-summary="ModelOnly" class="form-error"></div>
+
+
+            <div class="input-group">
+
+                <label>Email Address</label>
+
+                <input asp-for="Email"
+                       placeholder="Enter your Gmail address"
+                       autocomplete="email" />
+
+                <span asp-validation-for="Email"
+                      class="input-error"></span>
+
+            </div>
+
+
+
+            <div class="input-group password-group">
+
+                <label>Password</label>
+
+                <div class="password-wrapper">
+
+                    <input asp-for="Password"
+                           type="password"
+                           id="loginPassword"
+                           placeholder="Enter your password"
+                           autocomplete="current-password" />
+
+
+                    <span class="password-eye"
+                          onclick="togglePassword()">
+                        👁
+                    </span>
+
+                </div>
+
+
+                <span asp-validation-for="Password"
+                      class="input-error"></span>
+
+            </div>
+
+
+
+            <button type="submit" class="login-btn">
+                Login
+            </button>
+
+
+
+            <p class="register-link">
+
+                Don't have an account?
+
+                <a asp-controller="Account"
+                   asp-action="Register">
+                    Create Account
+                </a>
+
+            </p>
+
+
+        </form>
+
+    </div>
+
+
+</section>
+
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        function togglePassword() {
+
+            let password =
+                document.getElementById("loginPassword");
+
+
+            if (password.type === "password") {
+
+                password.type = "text";
+
+            }
+            else {
+
+                password.type = "password";
+
+            }
+
+        }
+
+    </script>
+
+}
