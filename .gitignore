@@ -1,5 +1,11 @@
+# Visual Studio
 .vs/
-bin/
-obj/
+
+# ASP.NET build files
+application/bin/
+application/obj/
+application/appsettings.json
+
+# Visual Studio user-specific files
 *.user
 *.suo
