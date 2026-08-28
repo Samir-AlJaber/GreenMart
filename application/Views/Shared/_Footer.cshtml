@@ -1,0 +1,89 @@
+﻿<footer class="green-footer">
+    <div class="footer-decoration footer-circle-one"></div>
+    <div class="footer-decoration footer-circle-two"></div>
+
+    <div class="footer-container">
+
+        <div class="footer-brand">
+            <h2>GreenMart</h2>
+            <p>A sustainable marketplace where people buy, sell and grow together.</p>
+
+            <div class="footer-social">
+                <a href="#">🌐</a>
+                <a href="#">📘</a>
+                <a href="#">📸</a>
+                <a href="#">💼</a>
+            </div>
+        </div>
+
+        <div class="footer-column">
+            <h3>Explore</h3>
+            <a asp-controller="Home" asp-action="Index">Home</a>
+            <a href="#">Products</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </div>
+
+        <div class="footer-column">
+
+            <h3>Account</h3>
+
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+
+            <a asp-controller="Account"
+               asp-action="Profile">
+
+                Profile
+
+            </a>
+
+
+            <a href="#">
+                Orders
+            </a>
+
+
+            <a href="javascript:void(0)"
+               onclick="showLogoutPopup()">
+
+                Logout
+
+            </a>
+
+            }
+            else
+            {
+
+            <a asp-controller="Account"
+               asp-action="Login">
+
+                Login
+
+            </a>
+
+
+            <a asp-controller="Account"
+               asp-action="Register">
+
+                Register
+
+            </a>
+
+            }
+
+        </div>
+
+        <div class="footer-column">
+            <h3>Contact</h3>
+            <p>📧 support@greenmart.com</p>
+            <p>📞 +880 1234 567890</p>
+            <p>📍    Bangladesh</p>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 GreenMart. All rights reserved.</p>
+    </div>
+</footer>

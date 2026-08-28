@@ -1,0 +1,206 @@
+﻿<nav class="green-navbar">
+
+    <div class="navbar-container">
+
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="navbar-brand">
+
+            🌱 GreenMart
+
+        </a>
+
+
+
+        <button class="menu-toggle"
+                onclick="toggleMenu()">
+
+            ☰
+
+        </button>
+
+
+
+
+        <div class="navbar-menu" id="navbarMenu">
+
+
+            <div class="navbar-links">
+
+
+                <a asp-controller="Home"
+                   asp-action="Index">
+                    Home
+                </a>
+
+
+                <a href="#">
+                    Products
+                </a>
+
+
+                <a href="#">
+                    About
+                </a>
+
+
+                <a href="#">
+                    Contact
+                </a>
+
+
+            </div>
+
+
+
+
+            <div class="navbar-actions">
+
+
+                @if (User.Identity != null &&
+                    User.Identity.IsAuthenticated)
+                {
+
+
+                <span class="welcome-user">
+
+                    👋 Hello,
+                    @User.Identity.Name
+
+                </span>
+
+
+
+                <a asp-controller="Account"
+                   asp-action="Profile"
+                   class="nav-profile">
+
+                    Profile
+
+                </a>
+
+
+
+
+                <a href="javascript:void(0)"
+                   onclick="showLogoutPopup()"
+                   class="nav-logout">
+
+                    Logout
+
+                </a>
+
+
+                }
+
+                else
+                {
+
+
+                <a asp-controller="Account"
+                   asp-action="Login"
+                   class="nav-login">
+
+                    Login
+
+                </a>
+
+
+
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="nav-register">
+
+                    Register
+
+                </a>
+
+
+                }
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</nav>
+
+<div class="logout-overlay" id="logoutPopup">
+
+    <div class="logout-box">
+
+        <div class="logout-icon">
+            ⚠️
+        </div>
+
+        <h3>
+            Logout Confirmation
+        </h3>
+
+        <p>
+            Are you sure you want to logout from GreenMart?
+        </p>
+
+
+        <div class="logout-buttons">
+
+            <button onclick="hideLogoutPopup()"
+                    class="cancel-btn">
+
+                Cancel
+
+            </button>
+
+
+            <a asp-controller="Account"
+               asp-action="Logout"
+               class="confirm-btn">
+
+                Confirm
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+<script>
+
+    function showLogoutPopup() {
+
+        document
+            .getElementById("logoutPopup")
+            .style.display = "flex";
+
+    }
+
+
+    function hideLogoutPopup() {
+
+        document
+            .getElementById("logoutPopup")
+            .style.display = "none";
+
+    }
+
+</script>
+
+<script>
+
+    function toggleMenu() {
+
+        document
+            .getElementById("navbarMenu")
+            .classList.toggle("active");
+
+    }
+
+</script>
