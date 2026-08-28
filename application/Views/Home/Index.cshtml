@@ -1,8 +1,459 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero-section">
+
+    <div class="hero-content">
+
+        <div class="hero-badge">
+            🌱 Sustainable Marketplace
+        </div>
+
+
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+
+            <h1>
+                Welcome Back,
+                <span>
+                    @User.Identity.Name
+                </span>
+            </h1>
+
+
+            <p>
+                Continue your GreenMart journey.
+                Discover products, manage your account,
+                and grow with our sustainable marketplace.
+            </p>
+
+
+            <div class="hero-buttons">
+
+
+                <a href="#"
+                   class="hero-btn primary">
+
+                    Explore Products
+
+                </a>
+
+
+                <a asp-controller="Account"
+                   asp-action="Profile"
+                   class="hero-btn secondary">
+
+                    My Profile
+
+                </a>
+
+
+            </div>
+
+        }
+        else
+        {
+
+            <h1>
+                Shop Smarter.
+                <span>
+                    Live Greener.
+                </span>
+            </h1>
+
+
+            <p>
+                GreenMart is a modern marketplace where people can buy,
+                sell, and discover products in a smarter and sustainable way.
+            </p>
+
+
+            <div class="hero-buttons">
+
+
+                <a href="#"
+                   class="hero-btn primary">
+
+                    Explore Products
+
+                </a>
+
+
+
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="hero-btn secondary">
+
+                    Join GreenMart
+
+                </a>
+
+
+            </div>
+
+        }
+
+    </div>
+
+
+    <div class="hero-decoration circle-one"></div>
+    <div class="hero-decoration circle-two"></div>
+
+</section>
+
+
+<section class="features-section">
+
+    <div class="feature-card">
+
+        <div class="feature-icon">
+            🛒
+        </div>
+
+        <h3>
+            Buy Products
+        </h3>
+
+        <p>
+            Discover quality products from trusted sellers.
+        </p>
+
+    </div>
+
+
+    <div class="feature-card">
+
+        <div class="feature-icon">
+            📦
+        </div>
+
+        <h3>
+            Sell Products
+        </h3>
+
+        <p>
+            Create listings and grow your marketplace presence.
+        </p>
+
+    </div>
+
+
+    <div class="feature-card">
+
+        <div class="feature-icon">
+            🔒
+        </div>
+
+        <h3>
+            Secure Platform
+        </h3>
+
+        <p>
+            Safe accounts and reliable transactions.
+        </p>
+
+    </div>
+
+
+    <div class="feature-card">
+
+        <div class="feature-icon">
+            🌍
+        </div>
+
+        <h3>
+            Green Community
+        </h3>
+
+        <p>
+            Connect with buyers and sellers easily.
+        </p>
+
+    </div>
+
+</section>
+
+<section class="categories-section">
+
+    <div class="section-title">
+
+        <span>
+            Explore Categories
+        </span>
+
+        <h2>
+            Find Everything You Need
+        </h2>
+
+        <p>
+            Browse different categories and discover amazing products.
+        </p>
+
+    </div>
+
+
+    <div class="categories-grid">
+
+
+        <div class="category-card">
+            <div class="category-icon">
+                💻
+            </div>
+
+            <h3>
+                Electronics
+            </h3>
+        </div>
+
+
+
+        <div class="category-card">
+            <div class="category-icon">
+                👕
+            </div>
+
+            <h3>
+                Fashion
+            </h3>
+        </div>
+
+
+
+        <div class="category-card">
+            <div class="category-icon">
+                🪑
+            </div>
+
+            <h3>
+                Furniture
+            </h3>
+        </div>
+
+
+
+        <div class="category-card">
+            <div class="category-icon">
+                📚
+            </div>
+
+            <h3>
+                Books
+            </h3>
+        </div>
+
+
+
+        <div class="category-card">
+            <div class="category-icon">
+                🍎
+            </div>
+
+            <h3>
+                Food
+            </h3>
+        </div>
+
+
+
+        <div class="category-card">
+            <div class="category-icon">
+                🌿
+            </div>
+
+            <h3>
+                Others
+            </h3>
+        </div>
+
+
+    </div>
+
+</section>
+
+<section class="how-section">
+
+
+    <div class="section-title">
+
+        <span>
+            Simple Process
+        </span>
+
+        <h2>
+            How GreenMart Works
+        </h2>
+
+        <p>
+            A simple and secure way to buy and sell products.
+        </p>
+
+    </div>
+
+
+
+    <div class="steps-container">
+
+
+        <div class="step-card">
+
+            <div class="step-number">
+                01
+            </div>
+
+            <div class="step-icon">
+                👤
+            </div>
+
+            <h3>
+                Create Account
+            </h3>
+
+            <p>
+                Register and create your GreenMart profile.
+            </p>
+
+        </div>
+
+
+
+        <div class="step-card">
+
+            <div class="step-number">
+                02
+            </div>
+
+            <div class="step-icon">
+                🛍️
+            </div>
+
+            <h3>
+                Buy or Sell
+            </h3>
+
+            <p>
+                Discover products or create your own listings.
+            </p>
+
+        </div>
+
+
+
+        <div class="step-card">
+
+            <div class="step-number">
+                03
+            </div>
+
+            <div class="step-icon">
+                🤝
+            </div>
+
+            <h3>
+                Connect & Grow
+            </h3>
+
+            <p>
+                Complete transactions and build connections.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+<section class="cta-section">
+
+
+    <div class="cta-content">
+
+
+        @if (User.Identity != null &&
+           User.Identity.IsAuthenticated)
+        {
+
+            <h2>
+                Ready to Continue,
+                @User.Identity.Name?
+            </h2>
+
+
+            <p>
+                Explore new products, manage your profile,
+                and continue your GreenMart journey.
+            </p>
+
+
+            <div class="cta-buttons">
+
+
+                <a asp-controller="Account"
+                   asp-action="Profile"
+                   class="cta-primary">
+
+                    My Profile
+
+                </a>
+
+
+                <a href="#"
+                   class="cta-secondary">
+
+                    Explore Products
+
+                </a>
+
+
+            </div>
+
+
+        }
+        else
+        {
+
+
+            <h2>
+                Ready to Join GreenMart?
+            </h2>
+
+
+            <p>
+                Start your journey today and become part of
+                a smarter, greener marketplace.
+            </p>
+
+
+
+            <div class="cta-buttons">
+
+
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="cta-primary">
+
+                    Create Account
+
+                </a>
+
+
+
+                <a href="#"
+                   class="cta-secondary">
+
+                    Explore Products
+
+                </a>
+
+
+            </div>
+
+
+        }
+
+    </div>
+
+
+</section>
