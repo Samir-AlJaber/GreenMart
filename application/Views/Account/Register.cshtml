@@ -1,0 +1,539 @@
+﻿@model GreenMart.Models.User
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+
+<section class="register-section">
+
+
+    <div class="register-container">
+
+
+        <div class="register-info">
+
+
+            <span class="register-badge">
+                🌱 Join GreenMart
+            </span>
+
+
+            <h1>
+                Start Your
+                <span>Green Journey</span>
+                Today
+            </h1>
+
+
+            <p>
+                Create your account and become part of a smarter,
+                sustainable marketplace where people buy and sell easily.
+            </p>
+
+
+            <div class="register-benefits">
+
+
+                <div class="benefit-item">
+                    <span>🛒</span>
+                    Easy Shopping
+                </div>
+
+
+                <div class="benefit-item">
+                    <span>📦</span>
+                    Sell Products
+                </div>
+
+
+                <div class="benefit-item">
+                    <span>🔒</span>
+                    Secure Platform
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+        <div class="register-card">
+
+
+            <div class="register-header">
+
+                <h2>
+                    Create Account
+                </h2>
+
+
+                <p>
+                    Fill in your details to get started.
+                </p>
+
+
+            </div>
+
+
+
+
+
+            <form id="registerForm"
+                  asp-controller="Account"
+                  asp-action="Register"
+                  method="post">
+
+
+
+                <div class="validation-summary">
+                    <span id="generalError"></span>
+                </div>
+
+
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Full Name
+                    </label>
+
+
+                    <input type="text"
+                           name="FullName"
+                           placeholder="Enter your full name"
+                           required />
+
+
+                    <span class="field-error"
+                          data-error="FullName">
+                    </span>
+
+
+                </div>
+
+
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Email Address
+                    </label>
+
+
+                    <input type="text"
+                           id="email"
+                           name="Email"
+                           placeholder="Enter your Gmail address"
+                           required />
+
+
+                    <span class="field-error"
+                          data-error="Email">
+                    </span>
+
+
+                </div>
+
+
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Password
+                    </label>
+
+
+                    <div class="password-wrapper">
+
+
+                        <input type="password"
+                               id="password"
+                               name="PasswordHash"
+                               placeholder="Create password"
+                               required />
+
+
+                        <span class="password-toggle"
+                              onclick="togglePassword('password')">
+
+                            👁
+
+                        </span>
+
+
+                    </div>
+
+
+                    <span class="field-error"
+                          data-error="PasswordHash">
+                    </span>
+
+
+                </div>
+
+
+
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Confirm Password
+                    </label>
+
+
+                    <div class="password-wrapper">
+
+
+                        <input type="password"
+                               id="confirmPassword"
+                               placeholder="Confirm password"
+                               required />
+
+
+                        <span class="password-toggle"
+                              onclick="togglePassword('confirmPassword')">
+
+                            👁
+
+                        </span>
+
+
+                    </div>
+
+
+                    <span class="field-error"
+                          id="confirmPasswordError">
+                    </span>
+
+
+                </div>
+
+
+
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Phone Number
+                    </label>
+
+
+                    <input type="text"
+                           id="phone"
+                           name="PhoneNumber"
+                           maxlength="11"
+                           placeholder="Enter 11 digit phone number"
+                           required />
+
+
+                    <span class="field-error"
+                          data-error="PhoneNumber">
+                    </span>
+
+
+                </div>
+
+
+
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Address(optional)
+                    </label>
+
+
+                    <input type="text"
+                           name="Address"
+                           placeholder="Enter your address" />
+
+
+                </div>
+
+
+
+
+
+
+
+                <button type="submit"
+                        class="register-submit">
+
+                    Create Account
+
+                </button>
+
+
+
+
+                <p class="account-link">
+
+                    Already have an account?
+
+
+                    <a asp-controller="Account"
+                       asp-action="Login">
+
+                        Login
+
+                    </a>
+
+
+                </p>
+
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+
+
+@section Scripts {
+
+
+    <script>
+
+
+        const form =
+            document.getElementById("registerForm");
+
+
+
+        function showError(field, message) {
+            document.querySelector(
+                `[data-error='${field}']`
+            ).innerHTML = message;
+        }
+
+
+
+        function clearErrors() {
+
+            document
+                .querySelectorAll(".field-error")
+                .forEach(x => x.innerHTML = "");
+
+
+            document
+                .getElementById("generalError")
+                .innerHTML = "";
+
+
+            document
+                .querySelector(".validation-summary")
+                .style.display = "none";
+
+        }
+
+
+
+
+
+        function togglePassword(id) {
+
+            let input =
+                document.getElementById(id);
+
+
+            if (input.type === "password") {
+                input.type = "text";
+            }
+            else {
+                input.type = "password";
+            }
+
+        }
+
+
+
+
+
+
+        form.addEventListener(
+            "submit",
+            async function(event) {
+
+
+                event.preventDefault();
+
+
+                clearErrors();
+
+
+
+                let email =
+                    document.getElementById("email").value;
+
+
+                let password =
+                    document.getElementById("password").value;
+
+
+                let confirmPassword =
+                    document.getElementById("confirmPassword").value;
+
+
+                let phone =
+                    document.getElementById("phone").value;
+
+
+
+                let valid = true;
+
+
+
+
+
+                if (!email.endsWith("@@gmail.com")) {
+
+                    showError(
+                        "Email",
+                        "Email must end with @@gmail.com"
+                    );
+
+                    valid = false;
+
+                }
+
+
+
+
+
+                if (password.length < 8) {
+
+                    showError(
+                        "PasswordHash",
+                        "Password must be at least 8 characters"
+                    );
+
+                    valid = false;
+
+                }
+
+
+                else if (!/[A-Z]/.test(password)) {
+
+                    showError(
+                        "PasswordHash",
+                        "Password must contain an uppercase letter"
+                    );
+
+                    valid = false;
+
+                }
+
+
+                else if (!/[a-z]/.test(password)) {
+
+                    showError(
+                        "PasswordHash",
+                        "Password must contain a lowercase letter"
+                    );
+
+                    valid = false;
+
+                }
+
+
+                else if (!/[0-9]/.test(password)) {
+
+                    showError(
+                        "PasswordHash",
+                        "Password must contain a digit"
+                    );
+
+                    valid = false;
+
+                }
+
+
+
+                if (password !== confirmPassword) {
+
+                    document
+                        .getElementById("confirmPasswordError")
+                        .innerHTML =
+                        "Passwords do not match";
+
+
+                    valid = false;
+
+                }
+
+
+                if (!/^\d{11}$/.test(phone)) {
+
+                    showError(
+                        "PhoneNumber",
+                        "Phone number must contain exactly 11 digits"
+                    );
+
+
+                    valid = false;
+
+                }
+
+
+                if (!valid) {
+                    return;
+                }
+
+
+
+                let response =
+                    await fetch(
+                        `/Account/CheckEmail?email=${email}`
+                    );
+
+
+
+                let result =
+                    await response.json();
+
+
+                if (result.exists) {
+
+                    showError(
+                        "Email",
+                        "This email is already registered"
+                    );
+
+
+                    return;
+
+                }
+
+                form.submit();
+            });
+
+    </script>
+
+
+}
