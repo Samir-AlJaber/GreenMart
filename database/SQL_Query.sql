@@ -1,0 +1,15 @@
+USE GreenMartDB;
+GO
+
+CREATE TABLE Users
+(
+    UserId INT PRIMARY KEY IDENTITY(1,1),
+    FullName VARCHAR(100) NOT NULL,
+    Email VARCHAR(150) UNIQUE NOT NULL,
+    PasswordHash VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(20),
+    Address VARCHAR(255),
+    Role VARCHAR(20) DEFAULT 'User',
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    IsActive BIT DEFAULT 1
+);
