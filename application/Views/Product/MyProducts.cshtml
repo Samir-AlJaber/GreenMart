@@ -1,0 +1,334 @@
+@model IEnumerable<GreenMart.Models.Product>
+
+@{
+    ViewData["Title"] = "My Products";
+}
+
+
+
+<section class="my-products-page">
+
+
+    <div class="my-products-header">
+
+
+        <h1>
+            My Products
+        </h1>
+
+
+        <p>
+            Manage the products you have listed on GreenMart.
+        </p>
+
+
+
+        <a asp-controller="Product"
+           asp-action="Create"
+           class="my-product-add-btn">
+
+            Add New Product
+
+        </a>
+
+
+    </div>
+
+
+
+
+
+
+
+    @if (!Model.Any())
+    {
+
+
+        <div class="my-products-empty">
+
+
+            <h2>
+                No Products Found
+            </h2>
+
+
+
+            <p>
+                You have not added any products yet.
+            </p>
+
+
+
+
+            <a asp-controller="Product"
+               asp-action="Create">
+
+                Create Your First Product
+
+            </a>
+
+
+        </div>
+
+
+    }
+    else
+    {
+
+
+
+        <div class="my-products-grid">
+
+
+
+            @foreach (var product in Model)
+            {
+
+
+                <div class="my-product-card">
+
+
+
+                    <div class="my-product-category">
+
+
+                        @product.Category.CategoryName
+
+
+                    </div>
+
+
+
+
+
+
+                    <h2>
+
+                        @product.ProductName
+
+                    </h2>
+
+                    <p class="my-product-brand">
+
+                        Brand:
+                        @(string.IsNullOrEmpty(product.Brand)
+                            ? "Not specified"
+                            : product.Brand)
+
+                    </p>
+
+
+                    <p>
+
+                        Price:
+                        ৳@product.Price
+
+                    </p>
+
+
+
+
+
+
+                    <p>
+
+                        Stock:
+                        @product.StockQuantity
+
+                    </p>
+
+
+
+
+
+
+                    <p>
+
+                        Status:
+
+                        @(product.IsActive
+                            ? "Active"
+                            : "Inactive")
+
+                    </p>
+
+
+
+
+
+
+
+
+                    <div class="my-product-actions">
+
+
+
+
+
+                        <a asp-controller="Product"
+                           asp-action="Details"
+                           asp-route-id="@product.ProductId">
+
+                            View
+
+                        </a>
+
+
+
+
+
+
+
+                        <a asp-controller="Product"
+                           asp-action="Edit"
+                           asp-route-id="@product.ProductId">
+
+                            Edit
+
+                        </a>
+
+
+
+
+
+
+
+                        <button type="button"
+                                onclick="showDeletePopup(@product.ProductId)"
+                                class="product-delete-btn">
+
+                            Delete
+
+                        </button>
+
+
+
+
+
+                    </div>
+
+
+
+                </div>
+
+
+            }
+
+
+
+        </div>
+
+
+    }
+
+
+
+</section>
+
+
+
+
+
+
+
+<div class="delete-overlay"
+     id="deletePopup">
+
+
+    <div class="delete-box">
+
+
+        <div class="delete-icon">
+
+            ⚠️
+
+        </div>
+
+
+        <h3>
+            Delete Product?
+        </h3>
+
+
+        <p>
+            Are you sure you want to remove this product from your listings?
+        </p>
+
+
+
+        <div class="delete-buttons">
+
+
+            <button type="button"
+                    onclick="hideDeletePopup()"
+                    class="delete-cancel">
+
+                Cancel
+
+            </button>
+
+
+
+
+            <form asp-controller="Product"
+                  asp-action="Delete"
+                  method="post">
+
+
+                <input type="hidden"
+                       id="deleteProductId"
+                       name="id" />
+
+
+
+                <button type="submit"
+                        class="delete-confirm">
+
+                    Confirm Delete
+
+                </button>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+    function showDeletePopup(id) {
+
+        document
+            .getElementById("deleteProductId")
+            .value = id;
+
+
+
+        document
+            .getElementById("deletePopup")
+            .style.display = "flex";
+
+    }
+
+
+
+
+
+    function hideDeletePopup() {
+
+        document
+            .getElementById("deletePopup")
+            .style.display = "none";
+
+    }
+
+
+</script>

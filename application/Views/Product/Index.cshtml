@@ -1,0 +1,227 @@
+@model IEnumerable<GreenMart.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+
+
+<section class="product-page">
+
+
+    <div class="product-page-header">
+
+
+        <h1>
+            Explore Products
+        </h1>
+
+
+        <p>
+            Discover products from GreenMart sellers.
+        </p>
+
+
+    </div>
+
+
+
+
+
+    @if (Model == null || !Model.Any())
+    {
+
+
+        <div class="empty-products">
+
+
+            <div class="empty-products-icon">
+
+                🛒
+
+            </div>
+
+
+
+            <h2>
+
+                No Products Available
+
+            </h2>
+
+
+
+            <p>
+
+                There are currently no products listed on GreenMart.
+
+            </p>
+
+
+
+
+
+            @if (User.Identity != null &&
+                 User.Identity.IsAuthenticated)
+            {
+
+                <a asp-controller="Product"
+                   asp-action="Create"
+                   class="empty-products-btn">
+
+                    Sell Your First Product
+
+                </a>
+
+            }
+            else
+            {
+
+                <a asp-controller="Account"
+                   asp-action="Register"
+                   class="empty-products-btn">
+
+                    Become A Seller
+
+                </a>
+
+            }
+
+
+        </div>
+
+
+    }
+    else
+    {
+
+
+        <div class="product-grid">
+
+
+            @foreach (var product in Model)
+            {
+
+
+                <div class="product-card-custom">
+
+
+                    <div class="product-category-tag">
+
+                        @product.Category.CategoryName
+
+                    </div>
+
+
+
+
+
+                    <h2>
+
+                        @product.ProductName
+
+                    </h2>
+
+
+
+
+
+                    <p class="product-brand-text">
+
+                        Brand:
+                        @(string.IsNullOrEmpty(product.Brand)
+                            ? "Not specified"
+                            : product.Brand)
+
+                    </p>
+
+
+
+
+
+
+                    <p class="product-description-text">
+
+                        @(string.IsNullOrEmpty(product.Description)
+                        ? "No description available."
+                        : product.Description)
+
+                    </p>
+
+
+
+
+
+
+
+                    <div class="product-info-box">
+
+
+                        <span>
+
+                            Price:
+                            ৳@product.Price
+
+                        </span>
+
+
+
+                        <span>
+
+                            Stock:
+                            @product.StockQuantity
+
+                        </span>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="product-seller-text">
+
+
+                        Seller:
+
+                        @product.User.FullName
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <a asp-controller="Product"
+                       asp-action="Details"
+                       asp-route-id="@product.ProductId"
+                       class="product-details-btn">
+
+
+                        View Details
+
+
+                    </a>
+
+
+
+                </div>
+
+
+            }
+
+
+        </div>
+
+
+    }
+
+
+
+</section>
