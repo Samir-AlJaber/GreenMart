@@ -21,7 +21,9 @@
 
             <h1>
                 Start Your
-                <span>Green Journey</span>
+                <span>
+                    Green Journey
+                </span>
                 Today
             </h1>
 
@@ -32,24 +34,42 @@
             </p>
 
 
+
             <div class="register-benefits">
 
 
                 <div class="benefit-item">
-                    <span>🛒</span>
+
+                    <span>
+                        🛒
+                    </span>
+
                     Easy Shopping
+
                 </div>
 
 
+
                 <div class="benefit-item">
-                    <span>📦</span>
+
+                    <span>
+                        📦
+                    </span>
+
                     Sell Products
+
                 </div>
 
 
+
                 <div class="benefit-item">
-                    <span>🔒</span>
+
+                    <span>
+                        🔒
+                    </span>
+
                     Secure Platform
+
                 </div>
 
 
@@ -62,14 +82,17 @@
 
 
 
+
         <div class="register-card">
 
 
             <div class="register-header">
 
+
                 <h2>
                     Create Account
                 </h2>
+
 
 
                 <p>
@@ -83,6 +106,7 @@
 
 
 
+
             <form id="registerForm"
                   asp-controller="Account"
                   asp-action="Register"
@@ -90,29 +114,39 @@
 
 
 
+
+
                 <div class="validation-summary">
+
                     <span id="generalError"></span>
+
                 </div>
 
 
 
 
 
+
                 <div class="input-group">
+
 
                     <label>
                         Full Name
                     </label>
 
 
+
                     <input type="text"
                            name="FullName"
                            placeholder="Enter your full name"
+                           value="@Model?.FullName"
                            required />
+
 
 
                     <span class="field-error"
                           data-error="FullName">
+
                     </span>
 
 
@@ -122,22 +156,28 @@
 
 
 
+
                 <div class="input-group">
+
 
                     <label>
                         Email Address
                     </label>
 
 
+
                     <input type="text"
                            id="email"
                            name="Email"
                            placeholder="Enter your Gmail address"
+                           value="@Model?.Email"
                            required />
+
 
 
                     <span class="field-error"
                           data-error="Email">
+
                     </span>
 
 
@@ -147,11 +187,14 @@
 
 
 
+
                 <div class="input-group">
+
 
                     <label>
                         Password
                     </label>
+
 
 
                     <div class="password-wrapper">
@@ -164,8 +207,9 @@
                                required />
 
 
+
                         <span class="password-toggle"
-                              onclick="togglePassword('password')">
+                              onclick="togglePassword('password', this)">
 
                             👁
 
@@ -175,8 +219,10 @@
                     </div>
 
 
+
                     <span class="field-error"
                           data-error="PasswordHash">
+
                     </span>
 
 
@@ -187,11 +233,15 @@
 
 
 
+
                 <div class="input-group">
+
 
                     <label>
                         Confirm Password
                     </label>
+
+
 
 
                     <div class="password-wrapper">
@@ -203,8 +253,9 @@
                                required />
 
 
+
                         <span class="password-toggle"
-                              onclick="togglePassword('confirmPassword')">
+                              onclick="togglePassword('confirmPassword', this)">
 
                             👁
 
@@ -214,8 +265,10 @@
                     </div>
 
 
+
                     <span class="field-error"
                           id="confirmPasswordError">
+
                     </span>
 
 
@@ -226,11 +279,14 @@
 
 
 
+
                 <div class="input-group">
+
 
                     <label>
                         Phone Number
                     </label>
+
 
 
                     <input type="text"
@@ -238,11 +294,14 @@
                            name="PhoneNumber"
                            maxlength="11"
                            placeholder="Enter 11 digit phone number"
+                           value="@Model?.PhoneNumber"
                            required />
+
 
 
                     <span class="field-error"
                           data-error="PhoneNumber">
+
                     </span>
 
 
@@ -253,19 +312,24 @@
 
 
 
+
                 <div class="input-group">
+
 
                     <label>
                         Address(optional)
                     </label>
 
 
+
                     <input type="text"
                            name="Address"
-                           placeholder="Enter your address" />
+                           placeholder="Enter your address"
+                           value="@Model?.Address" />
 
 
                 </div>
+
 
 
 
@@ -276,16 +340,23 @@
                 <button type="submit"
                         class="register-submit">
 
+
                     Create Account
+
 
                 </button>
 
 
 
 
+
+
+
                 <p class="account-link">
 
+
                     Already have an account?
+
 
 
                     <a asp-controller="Account"
@@ -300,16 +371,21 @@
 
 
 
+
             </form>
+
 
 
         </div>
 
 
+
     </div>
 
 
+
 </section>
+
 
 
 
@@ -326,11 +402,15 @@
 
 
 
+
         function showError(field, message) {
+
             document.querySelector(
                 `[data-error='${field}']`
             ).innerHTML = message;
+
         }
+
 
 
 
@@ -341,14 +421,10 @@
                 .forEach(x => x.innerHTML = "");
 
 
+
             document
                 .getElementById("generalError")
                 .innerHTML = "";
-
-
-            document
-                .querySelector(".validation-summary")
-                .style.display = "none";
 
         }
 
@@ -356,17 +432,26 @@
 
 
 
-        function togglePassword(id) {
+        function togglePassword(id, icon) {
 
             let input =
                 document.getElementById(id);
 
 
+
             if (input.type === "password") {
+
                 input.type = "text";
+
+                icon.innerHTML = "🙈";
+
             }
             else {
+
                 input.type = "password";
+
+                icon.innerHTML = "👁";
+
             }
 
         }
@@ -384,6 +469,7 @@
                 event.preventDefault();
 
 
+
                 clearErrors();
 
 
@@ -392,12 +478,15 @@
                     document.getElementById("email").value;
 
 
+
                 let password =
                     document.getElementById("password").value;
 
 
+
                 let confirmPassword =
                     document.getElementById("confirmPassword").value;
+
 
 
                 let phone =
@@ -411,6 +500,7 @@
 
 
 
+
                 if (!email.endsWith("@@gmail.com")) {
 
                     showError(
@@ -418,9 +508,11 @@
                         "Email must end with @@gmail.com"
                     );
 
+
                     valid = false;
 
                 }
+
 
 
 
@@ -433,11 +525,10 @@
                         "Password must be at least 8 characters"
                     );
 
+
                     valid = false;
 
                 }
-
-
                 else if (!/[A-Z]/.test(password)) {
 
                     showError(
@@ -445,11 +536,10 @@
                         "Password must contain an uppercase letter"
                     );
 
+
                     valid = false;
 
                 }
-
-
                 else if (!/[a-z]/.test(password)) {
 
                     showError(
@@ -457,11 +547,10 @@
                         "Password must contain a lowercase letter"
                     );
 
+
                     valid = false;
 
                 }
-
-
                 else if (!/[0-9]/.test(password)) {
 
                     showError(
@@ -469,9 +558,13 @@
                         "Password must contain a digit"
                     );
 
+
                     valid = false;
 
                 }
+
+
+
 
 
 
@@ -488,6 +581,10 @@
                 }
 
 
+
+
+
+
                 if (!/^\d{11}$/.test(phone)) {
 
                     showError(
@@ -501,9 +598,16 @@
                 }
 
 
+
+
+
+
                 if (!valid) {
                     return;
                 }
+
+
+
 
 
 
@@ -518,6 +622,9 @@
                     await response.json();
 
 
+
+
+
                 if (result.exists) {
 
                     showError(
@@ -530,8 +637,15 @@
 
                 }
 
+
+
+
+
                 form.submit();
+
+
             });
+
 
     </script>
 
