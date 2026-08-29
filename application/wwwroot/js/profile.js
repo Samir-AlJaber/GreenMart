@@ -1,4 +1,4 @@
-function openProfileModal() {
+﻿function openProfileModal() {
 
     const modal = document.getElementById("profileModal");
 
