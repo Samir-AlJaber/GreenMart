@@ -23,7 +23,10 @@
 
 
 
-        <div class="navbar-menu" id="navbarMenu">
+
+        <div class="navbar-menu"
+             id="navbarMenu">
+
 
 
             <div class="navbar-links">
@@ -31,26 +34,95 @@
 
                 <a asp-controller="Home"
                    asp-action="Index">
+
                     Home
+
                 </a>
 
 
-                <a href="#">
+
+
+
+                <a asp-controller="Product"
+                   asp-action="Index">
+
                     Products
+
                 </a>
 
 
+
+
+
+                @if (User.Identity != null &&
+                     User.Identity.IsAuthenticated)
+                {
+
+
+                    <a asp-controller="Product"
+                       asp-action="Create">
+
+                        Sell Product
+
+                    </a>
+
+
+
+
+
+                    <a asp-controller="Product"
+                       asp-action="MyProducts">
+
+                        My Products
+
+                    </a>
+
+
+
+
+
+                    <a asp-controller="Cart"
+                       asp-action="Index"
+                       class="cart-link">
+
+                        🛒 Cart
+
+                        <span class="cart-badge">
+                            @await Component.InvokeAsync("CartCount")
+                        </span>
+
+                    </a>
+
+
+                }
+
+
+
+
+
                 <a href="#">
+
                     About
+
                 </a>
+
+
+
 
 
                 <a href="#">
+
                     Contact
+
                 </a>
+
 
 
             </div>
+
+
+
+
 
 
 
@@ -58,63 +130,68 @@
             <div class="navbar-actions">
 
 
+
                 @if (User.Identity != null &&
-                    User.Identity.IsAuthenticated)
+                     User.Identity.IsAuthenticated)
                 {
 
 
-                <span class="welcome-user">
+                    <span class="welcome-user">
 
-                    👋 Hello,
-                    @User.Identity.Name
+                        👋 Hello,
+                        @User.Identity.Name
 
-                </span>
-
-
-
-                <a asp-controller="Account"
-                   asp-action="Profile"
-                   class="nav-profile">
-
-                    Profile
-
-                </a>
+                    </span>
 
 
 
 
-                <a href="javascript:void(0)"
-                   onclick="showLogoutPopup()"
-                   class="nav-logout">
 
-                    Logout
+                    <a asp-controller="Account"
+                       asp-action="Profile"
+                       class="nav-profile">
 
-                </a>
+                        Profile
+
+                    </a>
+
+
+
+
+
+                    <a href="javascript:void(0)"
+                       onclick="showLogoutPopup()"
+                       class="nav-logout">
+
+                        Logout
+
+                    </a>
 
 
                 }
-
                 else
                 {
 
 
-                <a asp-controller="Account"
-                   asp-action="Login"
-                   class="nav-login">
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="nav-login">
 
-                    Login
+                        Login
 
-                </a>
+                    </a>
 
 
 
-                <a asp-controller="Account"
-                   asp-action="Register"
-                   class="nav-register">
 
-                    Register
 
-                </a>
+                    <a asp-controller="Account"
+                       asp-action="Register"
+                       class="nav-register">
+
+                        Register
+
+                    </a>
 
 
                 }
@@ -123,31 +200,61 @@
             </div>
 
 
+
         </div>
+
 
 
     </div>
 
+
 </nav>
 
-<div class="logout-overlay" id="logoutPopup">
+
+
+
+
+
+
+<div class="logout-overlay"
+     id="logoutPopup">
+
 
     <div class="logout-box">
 
+
         <div class="logout-icon">
+
             ⚠️
+
         </div>
 
+
+
+
+
         <h3>
+
             Logout Confirmation
+
         </h3>
 
+
+
+
+
         <p>
+
             Are you sure you want to logout from GreenMart?
+
         </p>
 
 
+
+
+
         <div class="logout-buttons">
+
 
             <button onclick="hideLogoutPopup()"
                     class="cancel-btn">
@@ -155,6 +262,9 @@
                 Cancel
 
             </button>
+
+
+
 
 
             <a asp-controller="Account"
@@ -165,42 +275,59 @@
 
             </a>
 
+
+
         </div>
 
 
     </div>
 
+
 </div>
 
-<script>
-
-    function showLogoutPopup() {
-
-        document
-            .getElementById("logoutPopup")
-            .style.display = "flex";
-
-    }
 
 
-    function hideLogoutPopup() {
 
-        document
-            .getElementById("logoutPopup")
-            .style.display = "none";
 
-    }
 
-</script>
 
 <script>
 
-    function toggleMenu() {
 
-        document
-            .getElementById("navbarMenu")
-            .classList.toggle("active");
+function showLogoutPopup()
+{
 
-    }
+    document
+    .getElementById("logoutPopup")
+    .style.display = "flex";
+
+}
+
+
+
+
+
+function hideLogoutPopup()
+{
+
+    document
+    .getElementById("logoutPopup")
+    .style.display = "none";
+
+}
+
+
+
+
+
+function toggleMenu()
+{
+
+    document
+    .getElementById("navbarMenu")
+    .classList.toggle("active");
+
+}
+
 
 </script>
