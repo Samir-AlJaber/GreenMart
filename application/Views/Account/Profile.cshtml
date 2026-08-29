@@ -12,9 +12,13 @@
 
         <div class="profile-header">
 
+
             <div class="profile-avatar">
+
                 @Model.FullName.Substring(0, 1).ToUpper()
+
             </div>
+
 
 
             <h1>
@@ -22,39 +26,52 @@
             </h1>
 
 
+
             <p>
                 @Model.Email
             </p>
+
 
         </div>
 
 
 
+
+
         @if (TempData["SuccessMessage"] != null)
         {
+
             <div class="profile-success"
                  id="successMessage">
 
                 @TempData["SuccessMessage"]
 
             </div>
+
         }
+
+
 
 
         @if (TempData["ErrorMessage"] != null)
         {
+
             <div class="profile-error"
                  id="errorMessage">
 
                 @TempData["ErrorMessage"]
 
             </div>
+
         }
 
 
 
 
+
+
         <div class="profile-grid">
+
 
 
             <div class="profile-card">
@@ -63,6 +80,7 @@
                 <h2>
                     Profile Information
                 </h2>
+
 
 
 
@@ -82,6 +100,7 @@
 
 
 
+
                 <div class="profile-item">
 
                     <span class="profile-label">
@@ -94,6 +113,7 @@
                     </span>
 
                 </div>
+
 
 
 
@@ -118,6 +138,7 @@
 
 
 
+
                 <div class="profile-item">
 
                     <span class="profile-label">
@@ -138,6 +159,7 @@
 
 
 
+
                 <div class="profile-action-buttons">
 
 
@@ -147,6 +169,7 @@
                         Update Profile
 
                     </button>
+
 
 
 
@@ -167,12 +190,14 @@
 
 
 
+
             <div class="profile-card">
 
 
                 <h2>
                     Account Information
                 </h2>
+
 
 
 
@@ -188,6 +213,8 @@
                     </span>
 
                 </div>
+
+
 
 
 
@@ -208,6 +235,8 @@
 
 
 
+
+
                 <div class="profile-item">
 
                     <span class="profile-label">
@@ -224,7 +253,6 @@
                 </div>
 
 
-
             </div>
 
 
@@ -233,7 +261,9 @@
 
     </div>
 
+
 </div>
+
 
 
 
@@ -252,6 +282,7 @@
 
 
 
+
         <form id="updateProfileForm"
               asp-controller="Account"
               asp-action="UpdateProfile"
@@ -264,9 +295,11 @@
             </label>
 
 
+
             <input class="profile-input"
                    name="FullName"
                    value="@Model.FullName" />
+
 
 
 
@@ -276,9 +309,12 @@
             </label>
 
 
+
+
             <input class="profile-input"
                    name="Email"
                    value="@Model.Email" />
+
 
 
 
@@ -288,9 +324,12 @@
             </label>
 
 
+
+
             <input class="profile-input"
                    name="PhoneNumber"
                    value="@Model.PhoneNumber" />
+
 
 
 
@@ -300,9 +339,12 @@
             </label>
 
 
+
+
             <input class="profile-input"
                    name="Address"
                    value="@Model.Address" />
+
 
 
 
@@ -317,6 +359,7 @@
                     Cancel
 
                 </button>
+
 
 
 
@@ -345,6 +388,8 @@
 
 
 
+
+
 <div class="confirm-modal"
      id="confirmModal">
 
@@ -358,9 +403,11 @@
 
 
 
+
         <h2>
             Confirm Changes
         </h2>
+
 
 
 
@@ -370,11 +417,14 @@
 
 
 
+
         <ul>
+
 
             <li>
                 Your profile information will be updated.
             </li>
+
 
 
             <li>
@@ -382,9 +432,11 @@
             </li>
 
 
+
             <li>
                 These changes will be saved permanently.
             </li>
+
 
         </ul>
 
@@ -404,6 +456,7 @@
 
 
 
+
             <button type="button"
                     class="confirm-save"
                     onclick="submitProfileUpdate()">
@@ -416,11 +469,12 @@
         </div>
 
 
-
     </div>
 
 
 </div>
+
+
 
 
 
@@ -441,10 +495,14 @@
 
 
 
+
         <form id="passwordForm"
               asp-controller="Account"
               asp-action="UpdatePassword"
               method="post">
+
+
+
 
 
             <label>
@@ -452,10 +510,30 @@
             </label>
 
 
-            <input class="profile-input"
-                   type="password"
-                   name="CurrentPassword"
-                   placeholder="Enter current password" />
+
+            <div class="password-input-wrapper">
+
+
+                <input class="profile-input"
+                       id="currentPassword"
+                       type="password"
+                       name="CurrentPassword"
+                       placeholder="Enter current password" />
+
+
+
+                <span class="password-eye"
+                      onclick="togglePassword('currentPassword', this)">
+
+                    👁
+
+                </span>
+
+
+            </div>
+
+
+
 
 
 
@@ -465,10 +543,31 @@
             </label>
 
 
-            <input class="profile-input"
-                   type="password"
-                   name="NewPassword"
-                   placeholder="Enter new password" />
+
+
+            <div class="password-input-wrapper">
+
+
+                <input class="profile-input"
+                       id="newPassword"
+                       type="password"
+                       name="NewPassword"
+                       placeholder="Enter new password" />
+
+
+
+                <span class="password-eye"
+                      onclick="togglePassword('newPassword', this)">
+
+                    👁
+
+                </span>
+
+
+            </div>
+
+
+
 
 
 
@@ -478,10 +577,31 @@
             </label>
 
 
-            <input class="profile-input"
-                   type="password"
-                   name="ConfirmPassword"
-                   placeholder="Confirm new password" />
+
+
+            <div class="password-input-wrapper">
+
+
+                <input class="profile-input"
+                       id="confirmPassword"
+                       type="password"
+                       name="ConfirmPassword"
+                       placeholder="Confirm new password" />
+
+
+
+                <span class="password-eye"
+                      onclick="togglePassword('confirmPassword', this)">
+
+                    👁
+
+                </span>
+
+
+            </div>
+
+
+
 
 
 
@@ -496,6 +616,8 @@
                     Cancel
 
                 </button>
+
+
 
 
 
@@ -525,6 +647,8 @@
 
 
 
+
+
 <div class="confirm-modal"
      id="passwordConfirmModal">
 
@@ -533,8 +657,12 @@
 
 
         <div class="warning-icon">
+
             !
+
         </div>
+
+
 
 
 
@@ -544,17 +672,23 @@
 
 
 
+
+
         <p>
             Are you sure you want to change your password?
         </p>
 
 
 
+
+
         <ul>
+
 
             <li>
                 Your current session will end.
             </li>
+
 
 
             <li>
@@ -562,11 +696,14 @@
             </li>
 
 
+
             <li>
                 Your old password will stop working.
             </li>
 
+
         </ul>
+
 
 
 
@@ -584,6 +721,8 @@
 
 
 
+
+
             <button type="button"
                     class="confirm-save"
                     onclick="submitPasswordUpdate()">
@@ -594,7 +733,6 @@
 
 
         </div>
-
 
 
     </div>

@@ -120,9 +120,14 @@
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    font-size: 20px;
+    font-size: 25px;
     color: #16a34a;
     transition: .3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    line-height: 1;
 }
 
 
@@ -313,4 +318,9 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.eye-icon {
+    display: inline-block;
+    transform: translateY(3px);
 }

@@ -297,3 +297,34 @@
     color: #064e3b;
     font-weight: 800;
 }
+
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+
+
+    .password-input-wrapper .profile-input {
+        padding-right: 45px;
+    }
+
+
+
+.password-eye {
+    position: absolute;
+    right: 15px;
+    top: 37%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    user-select: none;
+    transition: .3s ease;
+    line-height: 1;
+}
+
+
+
+    .password-eye:hover {
+        transform: translateY(-50%) scale(1.2);
+    }
