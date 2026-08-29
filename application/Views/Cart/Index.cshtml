@@ -1,0 +1,955 @@
+@model GreenMart.Models.Cart?
+
+@{
+    ViewData["Title"] = "My Cart";
+}
+
+
+
+<section class="cart-page">
+
+
+    <div class="cart-header">
+
+        <h1>
+            Shopping Cart
+        </h1>
+
+
+        <p>
+            Review your selected products before checkout.
+        </p>
+
+    </div>
+
+
+
+
+
+    @if (Model == null ||
+         Model.CartItems == null ||
+         !Model.CartItems.Any())
+    {
+
+
+        <div class="empty-cart">
+
+
+            <div class="empty-cart-icon">
+
+                🛒
+
+            </div>
+
+
+
+            <h2>
+
+                Your Cart is Empty
+
+            </h2>
+
+
+
+            <p>
+
+                You have not added any products yet.
+
+            </p>
+
+
+
+
+            <a asp-controller="Product"
+               asp-action="Index"
+               class="cart-action-btn">
+
+                Explore Products
+
+            </a>
+
+
+
+        </div>
+
+
+    }
+    else
+    {
+
+
+        decimal total = 0;
+
+
+
+        <div class="cart-container">
+
+
+
+            <div class="cart-items-section">
+
+
+
+                @foreach (var item in Model.CartItems)
+                {
+
+
+                    var subtotal =
+                        item.Product.Price * item.Quantity;
+
+
+                    total += subtotal;
+
+
+
+
+                    <div class="cart-item-card"
+                         id="cart-item-@item.CartItemId">
+
+
+
+
+
+                        <div class="cart-product-info">
+
+
+                            <h2>
+                                @item.Product.ProductName
+                            </h2>
+
+
+
+                            @if (!string.IsNullOrEmpty(item.Product.Brand))
+                            {
+
+                                <p>
+                                    Brand:
+                                    @item.Product.Brand
+                                </p>
+
+                            }
+
+
+
+
+                            <p>
+                                Seller:
+                                @(item.Product.User == null
+                                    ? "Unknown Seller"
+                                    : item.Product.User.FullName)
+                            </p>
+
+
+
+                            <p class="stock-info">
+
+                                Available:
+                                @item.Product.StockQuantity
+                                pieces
+
+                            </p>
+
+
+
+
+                            <span class="cart-price">
+
+                                ৳@item.Product.Price
+
+                            </span>
+
+
+
+                        </div>
+
+
+
+
+
+
+
+                        <div class="cart-controls">
+
+
+
+                            <button type="button"
+                                    onclick="changeQuantity(
+                                    @item.CartItemId,
+                                    -1,
+                                    @item.Product.StockQuantity,
+                                    @item.Product.Price)"
+                                    class="quantity-btn">
+
+                                −
+
+                            </button>
+
+
+
+
+
+                            <input type="number"
+                                   id="quantity-@item.CartItemId"
+                                   value="@item.Quantity"
+                                   min="1"
+                                   max="@item.Product.StockQuantity"
+                                   onchange="updateQuantity(
+                                   @item.CartItemId,
+                                   @item.Product.StockQuantity,
+                                   @item.Product.Price)"
+                                   class="quantity-input" />
+
+
+
+
+
+
+                            <button type="button"
+                                    onclick="changeQuantity(
+                                    @item.CartItemId,
+                                    1,
+                                    @item.Product.StockQuantity,
+                                    @item.Product.Price)"
+                                    class="quantity-btn">
+
+                                +
+
+                            </button>
+
+
+
+
+                            <div id="error-@item.CartItemId"
+                                 class="quantity-error">
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+
+
+                        <div class="cart-subtotal">
+
+
+                            <span>
+                                Subtotal
+                            </span>
+
+
+                            <strong id="subtotal-@item.CartItemId">
+
+                                ৳@subtotal
+
+                            </strong>
+
+
+                        </div>
+
+
+
+
+
+
+
+                        <div class="cart-remove">
+
+
+                            <button type="button"
+                                    onclick="showRemovePopup(@item.CartItemId)"
+                                    class="remove-btn">
+
+                                Remove
+
+                            </button>
+
+
+                        </div>
+
+
+
+                    </div>
+
+
+
+                }
+
+
+            </div>
+
+
+
+
+
+
+
+
+            <div class="cart-summary">
+
+
+                <h2>
+                    Cart Summary
+                </h2>
+
+
+
+
+
+                <div class="cart-total">
+
+
+                    <span>
+                        Total
+                    </span>
+
+
+
+                    <strong id="cart-total">
+
+                        ৳@total
+
+                    </strong>
+
+
+                </div>
+
+
+
+
+
+                <a asp-controller="Product"
+                   asp-action="Index"
+                   class="continue-shopping-btn">
+
+                    Continue Shopping
+
+                </a>
+
+
+
+
+
+
+                <button onclick="validateCheckout()"
+                        class="checkout-btn">
+
+                    Proceed To Checkout
+
+                </button>
+
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+    }
+
+
+
+
+
+
+
+<div class="remove-overlay"
+     id="removePopup">
+
+
+    <div class="remove-box">
+
+
+        <div class="remove-icon">
+
+            🛒
+
+        </div>
+
+
+
+        <h3>
+
+            Remove Item?
+
+        </h3>
+
+
+
+        <p>
+
+            Are you sure you want to remove this product from your cart?
+
+        </p>
+
+
+
+        <div class="remove-buttons">
+
+
+            <button onclick="hideRemovePopup()"
+                    class="remove-cancel">
+
+                Cancel
+
+            </button>
+
+
+
+
+            <button onclick="confirmRemove()"
+                    class="remove-confirm">
+
+                Remove
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="remove-overlay"
+     id="checkoutPopup">
+
+
+    <div class="remove-box">
+
+
+        <div class="remove-icon">
+
+            ⚠️
+
+        </div>
+
+
+
+        <h3>
+
+            Checkout Warning
+
+        </h3>
+
+
+
+        <p id="checkoutMessage">
+
+        </p>
+
+
+
+        <div class="remove-buttons">
+
+
+            <button onclick="closeCheckoutPopup()"
+                    class="remove-cancel">
+
+                Cancel
+
+            </button>
+
+
+
+
+            <a asp-controller="Cart"
+               asp-action="Index"
+               class="remove-confirm">
+
+                Review Cart
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+<script>
+
+
+function validateCheckout()
+{
+
+    fetch('/Cart/ValidateCheckout')
+
+    .then(response =>
+        response.json()
+    )
+
+
+    .then(data =>
+    {
+
+
+        if(data.success)
+        {
+
+            window.location.href =
+            "/Checkout";
+
+        }
+        else
+        {
+
+            document
+            .getElementById(
+                "checkoutMessage"
+            )
+            .innerHTML =
+            data.message;
+
+
+
+            document
+            .getElementById(
+                "checkoutPopup"
+            )
+            .style.display =
+            "flex";
+
+        }
+
+
+    });
+
+
+}
+
+
+
+
+
+
+function closeCheckoutPopup()
+{
+
+    document
+    .getElementById(
+        "checkoutPopup"
+    )
+    .style.display =
+    "none";
+
+}
+
+
+
+
+
+
+
+function changeQuantity(id, change, stock, price)
+{
+
+    let input =
+        document.getElementById(
+            "quantity-" + id
+        );
+
+
+    let quantity =
+        parseInt(input.value);
+
+
+
+    quantity += change;
+
+
+
+    if(quantity < 1)
+    {
+        quantity = 1;
+    }
+
+
+
+    if(quantity > stock)
+    {
+
+        showQuantityError(id, stock);
+
+        quantity = stock;
+
+    }
+    else
+    {
+
+        clearQuantityError(id);
+
+    }
+
+
+
+    input.value = quantity;
+
+
+    updateQuantity(
+        id,
+        stock,
+        price
+    );
+
+}
+
+
+
+
+
+
+
+function updateQuantity(id, stock, price)
+{
+
+    let input =
+        document.getElementById(
+            "quantity-" + id
+        );
+
+
+
+    let quantity =
+        parseInt(input.value);
+
+
+
+    if(quantity < 1)
+    {
+
+        quantity = 1;
+
+        input.value = 1;
+
+    }
+
+
+
+    if(quantity > stock)
+    {
+
+        quantity = stock;
+
+        input.value = stock;
+
+        showQuantityError(
+            id,
+            stock
+        );
+
+    }
+    else
+    {
+
+        clearQuantityError(id);
+
+    }
+
+
+
+
+    saveQuantity(
+        id,
+        quantity,
+        price
+    );
+
+}
+
+
+
+
+
+
+
+function saveQuantity(id, quantity, price)
+{
+
+    fetch('/Cart/UpdateQuantity',
+    {
+
+        method:'POST',
+
+        headers:
+        {
+            'Content-Type':
+            'application/x-www-form-urlencoded'
+        },
+
+
+        body:
+        `id=${id}&quantity=${quantity}`
+
+    })
+
+
+    .then(response =>
+        response.json()
+    )
+
+
+    .then(data =>
+    {
+
+
+        if(data.success)
+        {
+
+
+            document
+            .getElementById(
+                "subtotal-" + id
+            )
+            .innerHTML =
+            "৳" +
+            (
+                quantity * price
+            )
+            .toFixed(2);
+
+
+
+
+            document
+            .getElementById(
+                "cart-total"
+            )
+            .innerHTML =
+            "৳" +
+            data.total.toFixed(2);
+
+
+
+
+
+            let badge =
+            document.querySelector(
+                ".cart-badge"
+            );
+
+
+
+            if(badge)
+            {
+                badge.innerHTML =
+                data.count;
+            }
+
+
+        }
+
+
+    });
+
+
+}
+
+
+
+
+
+
+
+function showQuantityError(id, stock)
+{
+
+    document
+    .getElementById(
+        "error-" + id
+    )
+    .innerHTML =
+    "Only " + stock + " available";
+
+}
+
+
+
+
+
+
+
+function clearQuantityError(id)
+{
+
+    document
+    .getElementById(
+        "error-" + id
+    )
+    .innerHTML =
+    "";
+
+}
+
+
+
+
+
+
+let removeItemId = 0;
+
+
+
+
+
+function showRemovePopup(id)
+{
+
+    removeItemId = id;
+
+
+    document
+    .getElementById(
+        "removePopup"
+    )
+    .style.display = "flex";
+
+}
+
+
+
+
+
+
+function hideRemovePopup()
+{
+
+    document
+    .getElementById(
+        "removePopup"
+    )
+    .style.display = "none";
+
+}
+
+
+
+
+
+
+function confirmRemove()
+{
+
+
+    fetch('/Cart/RemoveAjax',
+    {
+
+        method:'POST',
+
+        headers:
+        {
+            'Content-Type':
+            'application/x-www-form-urlencoded'
+        },
+
+
+        body:
+        `id=${removeItemId}`
+
+    })
+
+
+    .then(response =>
+        response.json()
+    )
+
+
+    .then(data =>
+    {
+
+
+        if(data.success)
+        {
+
+
+            let item =
+            document.getElementById(
+                "cart-item-" + removeItemId
+            );
+
+
+
+            if(item)
+            {
+                item.remove();
+            }
+
+
+
+
+            document
+            .getElementById(
+                "cart-total"
+            )
+            .innerHTML =
+            "৳" +
+            data.total.toFixed(2);
+
+
+
+
+
+            let badge =
+            document.querySelector(
+                ".cart-badge"
+            );
+
+
+
+            if(badge)
+            {
+                badge.innerHTML =
+                data.count;
+            }
+
+
+
+
+            hideRemovePopup();
+
+
+
+            if(data.count == 0)
+            {
+                location.reload();
+            }
+
+
+        }
+
+
+    });
+
+
+}
+
+
+
+</script>
