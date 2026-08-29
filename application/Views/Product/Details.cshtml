@@ -1,0 +1,211 @@
+@model GreenMart.Models.Product
+
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+
+
+<section class="product-detail-page">
+
+
+    <div class="product-detail-container">
+
+
+        <div class="product-detail-category">
+
+
+            @Model.Category.CategoryName
+
+
+        </div>
+
+
+
+
+
+        <h1>
+
+            @Model.ProductName
+
+        </h1>
+
+
+
+
+
+
+
+        @if (!string.IsNullOrEmpty(Model.Brand))
+        {
+
+            <p class="product-detail-brand">
+
+                Brand:
+                @Model.Brand
+
+            </p>
+
+        }
+
+
+
+
+
+
+
+        <p class="product-detail-description">
+
+
+            @(string.IsNullOrEmpty(Model.Description)
+            ? "No description available."
+            : Model.Description)
+
+
+        </p>
+
+
+
+
+
+
+
+
+        <div class="product-detail-info">
+
+
+
+            <div class="product-detail-box">
+
+
+                <strong>
+                    Price
+                </strong>
+
+
+                <span>
+                    ৳@Model.Price
+                </span>
+
+
+            </div>
+
+
+
+
+
+
+
+            <div class="product-detail-box">
+
+
+                <strong>
+                    Available Stock
+                </strong>
+
+
+                <span>
+                    @Model.StockQuantity
+                </span>
+
+
+            </div>
+
+
+
+
+
+
+
+            <div class="product-detail-box">
+
+
+                <strong>
+                    Seller
+                </strong>
+
+
+                <span>
+                    @Model.User.FullName
+                </span>
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+        @if (User.Identity != null &&
+     User.Identity.IsAuthenticated)
+        {
+
+            var currentUserId = User.FindFirst("UserId")?.Value;
+
+
+            if (currentUserId == Model.UserId.ToString())
+            {
+
+                <a asp-controller="Product"
+                   asp-action="Edit"
+                   asp-route-id="@Model.ProductId"
+                   class="product-cart-button">
+
+
+                    Manage Product
+
+
+                </a>
+
+            }
+            else
+            {
+
+                <a asp-controller="Cart"
+                   asp-action="Add"
+                   asp-route-id="@Model.ProductId"
+                   class="product-cart-button">
+
+
+                    Add To Cart
+
+
+                </a>
+
+            }
+
+
+        }
+        else
+        {
+
+
+            <a asp-controller="Account"
+               asp-action="Login"
+               class="product-cart-button">
+
+
+                Login To Buy
+
+
+            </a>
+
+
+        }
+
+
+
+
+
+    </div>
+
+
+</section>
