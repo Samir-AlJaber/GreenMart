@@ -1,0 +1,214 @@
+@{
+    ViewData["Title"] = "About";
+}
+
+<link rel="stylesheet" href="~/css/information-pages.css" asp-append-version="true" />
+
+<div class="info-page about-page">
+    <section class="info-hero about-hero">
+        <div class="info-hero-copy">
+            <span class="info-kicker">About GreenMart</span>
+            <h1>Useful things deserve a <span>longer life.</span></h1>
+            <p>
+                GreenMart is a community marketplace built in Bangladesh for people who want
+                to buy thoughtfully, sell simply, and keep good products in use for longer.
+            </p>
+            <div class="info-actions">
+                <a asp-controller="Product" asp-action="Index" class="info-button info-button-primary">Explore Products</a>
+                <a asp-controller="Home" asp-action="Contact" class="info-button info-button-secondary">Meet the Team</a>
+            </div>
+        </div>
+
+        <figure class="about-hero-media">
+            <img src="~/images/about-greenmart-stock-v3.jpg"
+                 alt="A well-kept vintage camera and open used book arranged with natural flowers on a wooden table"
+                 fetchpriority="high" />
+            <figcaption>
+                <span class="photo-note-icon" aria-hidden="true">01</span>
+                <span><strong>Pass useful things forward</strong><small>Buy. Use. Relist. Repeat.</small></span>
+            </figcaption>
+            <div class="photo-tag photo-tag-top">Local reuse</div>
+            <div class="photo-tag photo-tag-bottom">Real community</div>
+        </figure>
+    </section>
+
+    <section class="info-section story-grid about-story-grid">
+        <figure class="story-image-card">
+            <img src="~/images/about-thrift-shopping.jpg"
+                 alt="A shopper browsing a colorful rack of pre-owned clothing in a thrift store"
+                 loading="lazy" />
+            <figcaption><span>Repair</span><span>Reuse</span><span>Relist</span></figcaption>
+        </figure>
+        <div class="about-story-copy">
+            <div class="section-heading left-aligned">
+                <span>Our Story</span>
+                <h2>A local marketplace with a greener purpose</h2>
+            </div>
+            <div class="story-copy">
+                <p>
+                    Many everyday products still have years of useful life when their first owner
+                    no longer needs them. GreenMart helps those items find their next home by making
+                    local buying and selling straightforward, accessible, and community-led.
+                </p>
+                <p>
+                    From a student looking for an affordable book to a family passing on furniture,
+                    each exchange can save money, reduce unnecessary waste, and strengthen connections
+                    between people across Dhaka and beyond.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section impact-strip" aria-label="GreenMart commitments">
+        <article>
+            <span>01</span>
+            <strong>Local first</strong>
+            <p>Helping nearby buyers and sellers connect more easily.</p>
+        </article>
+        <article>
+            <span>02</span>
+            <strong>Reuse more</strong>
+            <p>Keeping useful products in circulation instead of discarding them.</p>
+        </article>
+        <article>
+            <span>03</span>
+            <strong>Spend smarter</strong>
+            <p>Making quality items more affordable for more people.</p>
+        </article>
+    </section>
+
+    <section class="impact-detail-section">
+        <div class="section-heading left-aligned impact-heading">
+            <span>Our Impact</span>
+            <h2>Small exchanges can create meaningful change</h2>
+            <p>
+                GreenMart supports a more circular local economy by helping people get more value
+                from products that already exist.
+            </p>
+            <figure class="impact-side-image">
+                <img src="~/images/about-thrift-interior.jpg"
+                     alt="A colorful second-hand clothing shop with a vintage mirror and green plants"
+                     loading="lazy" />
+                <figcaption>Thoughtful spaces make second-hand choices feel welcoming.</figcaption>
+            </figure>
+        </div>
+
+        <div class="impact-detail-grid">
+            <article>
+                <span class="impact-number">01</span>
+                <div>
+                    <h3>Longer product life</h3>
+                    <p>Reselling gives books, electronics, clothing and household goods another useful chapter.</p>
+                </div>
+            </article>
+            <article>
+                <span class="impact-number">02</span>
+                <div>
+                    <h3>Less avoidable waste</h3>
+                    <p>Keeping usable items in circulation can reduce unnecessary disposal and replacement.</p>
+                </div>
+            </article>
+            <article>
+                <span class="impact-number">03</span>
+                <div>
+                    <h3>Better household value</h3>
+                    <p>Buyers access useful products more affordably while sellers recover value from unused items.</p>
+                </div>
+            </article>
+            <article>
+                <span class="impact-number">04</span>
+                <div>
+                    <h3>Stronger local exchange</h3>
+                    <p>Community-based listings make it easier for useful goods to stay within nearby communities.</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="values-section">
+        <div class="section-heading">
+            <span>What Guides Us</span>
+            <h2>Designed around people and the planet</h2>
+            <p>Simple principles shape the marketplace experience we are building.</p>
+        </div>
+
+        <div class="values-grid">
+            <article class="value-card">
+                <div class="value-icon">01</div>
+                <h3>Sustainability</h3>
+                <p>We encourage reuse and more considered consumption, one useful item at a time.</p>
+            </article>
+            <article class="value-card">
+                <div class="value-icon">02</div>
+                <h3>Community</h3>
+                <p>GreenMart brings real people together through practical local exchange.</p>
+            </article>
+            <article class="value-card">
+                <div class="value-icon">03</div>
+                <h3>Clarity</h3>
+                <p>Clear listings and familiar flows make buying and selling easier to understand.</p>
+            </article>
+            <article class="value-card">
+                <div class="value-icon">04</div>
+                <h3>Accessibility</h3>
+                <p>We want useful products and marketplace tools to be within everyone’s reach.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="community-perspective-section">
+        <div class="section-heading">
+            <span>Why GreenMart Matters</span>
+            <h2>Built around real marketplace needs</h2>
+            <p>These are the practical experiences GreenMart is designed to make possible.</p>
+        </div>
+
+        <div class="perspective-grid">
+            <article>
+                <span>Buyer perspective</span>
+                <h3>Find more value without always buying new.</h3>
+                <p>Clear local listings help buyers discover useful products that fit both their needs and budget.</p>
+            </article>
+            <article class="perspective-featured">
+                <span>Community perspective</span>
+                <h3>Make sustainable choices feel practical.</h3>
+                <p>GreenMart turns reuse from an abstract idea into a simple action people can take every day.</p>
+            </article>
+            <article>
+                <span>Seller perspective</span>
+                <h3>Give unused products a meaningful next home.</h3>
+                <p>Simple listing tools help sellers clear space, recover value, and prevent useful items going to waste.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="bangladesh-panel">
+        <div class="bangladesh-mark" aria-hidden="true">বাংলাদেশ</div>
+        <div>
+            <span class="info-kicker light">Built for Bangladesh</span>
+            <h2>Starting locally. Thinking sustainably.</h2>
+            <p>
+                GreenMart is shaped around the way Bangladeshi communities connect, trade, and
+                help one another—while supporting a future where fewer useful things go to waste.
+            </p>
+        </div>
+    </section>
+
+    <section class="info-cta">
+        <div>
+            <span>Ready to take part?</span>
+            <h2>Give something useful its next chapter.</h2>
+        </div>
+        <div class="info-actions">
+            <a asp-controller="Product" asp-action="Index" class="info-button info-button-light">Browse Products</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Product" asp-action="Create" class="info-button info-button-outline">Sell a Product</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="info-button info-button-outline">Join GreenMart</a>
+            }
+        </div>
+    </section>
+</div>
