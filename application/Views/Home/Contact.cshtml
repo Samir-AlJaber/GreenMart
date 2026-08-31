@@ -1,0 +1,128 @@
+@{
+    ViewData["Title"] = "Contact";
+}
+
+<link rel="stylesheet" href="~/css/information-pages.css" asp-append-version="true" />
+
+<div class="info-page contact-page">
+    <div class="info-background-decor" aria-hidden="true">
+        <span class="info-background-shape info-background-shape-one"></span>
+        <span class="info-background-shape info-background-shape-two"></span>
+        <span class="info-background-shape info-background-shape-three"></span>
+    </div>
+
+    <section class="info-hero contact-hero">
+        <div class="info-hero-copy">
+            <span class="info-kicker">Contact GreenMart</span>
+            <h1>Let’s start a <span>conversation.</span></h1>
+            <p>
+                Have a question, an idea, or need help with GreenMart? Contact a member of our team
+                or send one message to everyone.
+            </p>
+        </div>
+        <div class="contact-hero-card">
+            <span class="contact-hero-icon">HQ</span>
+            <small>Visit our office</small>
+            <strong>141 &amp; 142, Love Road</strong>
+            <p>Tejgaon Industrial Area<br />Dhaka-1208, Bangladesh</p>
+        </div>
+    </section>
+
+    <section class="contact-content">
+        <div class="team-contact-panel">
+            <div class="section-heading left-aligned">
+                <span>Our Team</span>
+                <h2>Talk to a real person</h2>
+                <p>Choose the team member you would like to reach.</p>
+            </div>
+
+            <div class="contact-list">
+                <article class="person-card">
+                    <div class="person-avatar">SJ</div>
+                    <div>
+                        <h3>Samir Al Jaber</h3>
+                        <a href="mailto:samir@@gmail.com">samir@@gmail.com</a>
+                        <a href="tel:+8801723424335">+880 1723424335</a>
+                    </div>
+                </article>
+                <article class="person-card">
+                    <div class="person-avatar">RT</div>
+                    <div>
+                        <h3>Rifa Rafia Tarin</h3>
+                        <a href="mailto:tarin@@gmail.com">tarin@@gmail.com</a>
+                        <a href="tel:+880176534242">+880 176534242</a>
+                    </div>
+                </article>
+                <article class="person-card">
+                    <div class="person-avatar">TK</div>
+                    <div>
+                        <h3>Tanim Mohammed Khan</h3>
+                        <a href="mailto:tanim@@gmail.com">tanim@@gmail.com</a>
+                        <a href="tel:+880153424234">+880 153424234</a>
+                    </div>
+                </article>
+                <article class="person-card">
+                    <div class="person-avatar">FA</div>
+                    <div>
+                        <h3>Fahim Raiyan Ahmed</h3>
+                        <a href="mailto:fahim@@gmail.com">fahim@@gmail.com</a>
+                        <a href="tel:+8801823123134">+880 1823123134</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <div class="message-card">
+            <span class="info-kicker">Send a message</span>
+            <h2>How can we help?</h2>
+            <form id="contactForm">
+                <div class="contact-form-row">
+                    <label>
+                        <span>Name</span>
+                        <input id="contactName" type="text" autocomplete="name" placeholder="Your name" required />
+                    </label>
+                    <label>
+                        <span>Email</span>
+                        <input id="contactEmail" type="email" autocomplete="email" placeholder="you@@example.com" required />
+                    </label>
+                </div>
+                <label>
+                    <span>Topic</span>
+                    <select id="contactTopic" required>
+                        <option value="">Choose a topic</option>
+                        <option>Buying on GreenMart</option>
+                        <option>Selling on GreenMart</option>
+                        <option>Account support</option>
+                        <option>Partnerships</option>
+                        <option>Feedback or suggestion</option>
+                        <option>Something else</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Message</span>
+                    <textarea id="contactMessage" rows="6" minlength="10" maxlength="1000" placeholder="Tell us how we can help..." required></textarea>
+                </label>
+                <button type="submit" class="info-button info-button-primary contact-submit">Open Email Draft</button>
+                <p class="form-note">This opens your email application with the message prepared for our team.</p>
+            </form>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("contactForm")?.addEventListener("submit", function (event) {
+            event.preventDefault();
+            if (!this.reportValidity()) return;
+
+            const name = document.getElementById("contactName").value.trim();
+            const email = document.getElementById("contactEmail").value.trim();
+            const topic = document.getElementById("contactTopic").value;
+            const message = document.getElementById("contactMessage").value.trim();
+            const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+            const cc = "tarin@@gmail.com,tanim@@gmail.com,fahim@@gmail.com";
+
+            window.location.href = `mailto:samir@@gmail.com?cc=${encodeURIComponent(cc)}&subject=${encodeURIComponent(`[GreenMart] ${topic}`)}&body=${encodeURIComponent(body)}`;
+        });
+    </script>
+}
