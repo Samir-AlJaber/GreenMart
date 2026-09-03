@@ -294,11 +294,15 @@
 
 
 .category-card {
+    display: block;
     background: rgba(255,255,255,0.75);
     backdrop-filter: blur(15px);
     border-radius: 25px;
-    padding: 35px 20px;
+    padding: 0 0 22px;
+    overflow: hidden;
     text-align: center;
+    color: inherit;
+    text-decoration: none;
     cursor: pointer;
     border: 1px solid rgba(255,255,255,.5);
     transition: .4s ease;
@@ -314,21 +318,36 @@
 
 
 
-.category-icon {
-    font-size: 50px;
+.category-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
     margin-bottom: 20px;
-    transition: .4s ease;
+    overflow: hidden;
+    background: #d1fae5;
 }
 
+.category-card:focus-visible {
+    outline: 3px solid #16a34a;
+    outline-offset: 5px;
+}
 
+.category-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform .45s ease, filter .45s ease;
+}
 
-.category-card:hover .category-icon {
-    transform: rotate(10deg) scale(1.2);
+.category-card:hover .category-image img {
+    transform: scale(1.08);
+    filter: saturate(1.05);
 }
 
 
 
 .category-card h3 {
+    margin: 0 14px;
     color: #064e3b;
     font-weight: 800;
     font-size: 1.1rem;
@@ -361,12 +380,12 @@
 
 
     .category-card {
-        padding: 25px 15px;
+        padding-bottom: 18px;
     }
 
 
-    .category-icon {
-        font-size: 40px;
+    .category-image {
+        margin-bottom: 16px;
     }
 }
 
