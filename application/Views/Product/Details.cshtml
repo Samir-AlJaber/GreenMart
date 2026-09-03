@@ -1,7 +1,42 @@
 ﻿@model GreenMart.Models.Product
 
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
+
 @{
     ViewData["Title"] = "Product Details";
+
+    var productImageDirectory = System.IO.Path.Combine(
+        WebHostEnvironment.WebRootPath,
+        "uploads",
+        "products"
+    );
+
+    var productImagePaths =
+        System.IO.Directory.Exists(productImageDirectory)
+            ? System.IO.Directory.GetFiles(
+                productImageDirectory,
+                $"product-{Model.ProductId}-*.png"
+            ).OrderBy(path => path).ToList()
+            : new List<string>();
+
+    var legacyImagePath = System.IO.Path.Combine(
+        productImageDirectory,
+        $"product-{Model.ProductId}.png"
+    );
+
+    if (productImagePaths.Count == 0 &&
+        System.IO.File.Exists(legacyImagePath))
+    {
+        productImagePaths.Add(legacyImagePath);
+    }
+
+    var productImageNames = productImagePaths
+        .Select(System.IO.Path.GetFileName)
+        .Where(fileName => fileName != null)
+        .Cast<string>()
+        .ToList();
+
+    var hasProductImage = productImageNames.Count > 0;
 }
 
 
@@ -10,6 +45,60 @@
 
 
     <div class="product-detail-container">
+
+        @if (hasProductImage)
+        {
+            <div class="product-detail-gallery"
+                 id="productDetailGallery">
+
+                <button type="button"
+                        class="product-gallery-main"
+                        id="productGalleryMain"
+                        data-gallery-src="@Url.Content($"~/uploads/products/{productImageNames[0]}")"
+                        aria-label="Open @Model.ProductName photo gallery">
+
+                    <img id="productGalleryMainImage"
+                         src="~/uploads/products/@productImageNames[0]"
+                         alt="@Model.ProductName main product photo" />
+
+                    <span class="product-gallery-open-hint">
+                        Open photo and zoom
+                    </span>
+
+                    <span class="product-gallery-count">
+                        1 / @productImageNames.Count
+                    </span>
+
+                </button>
+
+                @if (productImageNames.Count > 1)
+                {
+                    <div class="product-gallery-thumbnails"
+                         aria-label="Product photos">
+
+                        @for (var index = 0;
+                              index < productImageNames.Count;
+                              index++)
+                        {
+                            <button type="button"
+                                    class="product-gallery-thumbnail @(index == 0 ? "is-active" : string.Empty)"
+                                    data-gallery-thumbnail
+                                    data-gallery-index="@index"
+                                    data-gallery-src="@Url.Content($"~/uploads/products/{productImageNames[index]}")"
+                                    aria-label="View product photo @(index + 1)"
+                                    aria-pressed="@(index == 0 ? "true" : "false")">
+
+                                <img src="~/uploads/products/@productImageNames[index]"
+                                     alt="@Model.ProductName photo @(index + 1)"
+                                     loading="lazy" />
+
+                            </button>
+                        }
+
+                    </div>
+                }
+            </div>
+        }
 
 
         <div class="product-detail-category">
@@ -208,4 +297,314 @@
     </div>
 
 
+    @if (hasProductImage)
+    {
+        <div class="product-lightbox"
+             id="productLightbox"
+             role="dialog"
+             aria-modal="true"
+             aria-label="@Model.ProductName photo viewer"
+             hidden>
+
+            <button type="button"
+                    class="product-lightbox-close"
+                    id="productLightboxClose"
+                    aria-label="Close photo viewer">
+                ×
+            </button>
+
+            @if (productImageNames.Count > 1)
+            {
+                <button type="button"
+                        class="product-lightbox-navigation is-previous"
+                        id="productLightboxPrevious"
+                        aria-label="Previous product photo">
+                    Previous
+                </button>
+            }
+
+            <div class="product-lightbox-stage"
+                 id="productLightboxStage">
+
+                <img id="productLightboxImage"
+                     src="~/uploads/products/@productImageNames[0]"
+                     alt="@Model.ProductName enlarged product photo" />
+
+            </div>
+
+            @if (productImageNames.Count > 1)
+            {
+                <button type="button"
+                        class="product-lightbox-navigation is-next"
+                        id="productLightboxNext"
+                        aria-label="Next product photo">
+                    Next
+                </button>
+            }
+
+            <div class="product-lightbox-toolbar">
+
+                <button type="button"
+                        id="productZoomOut"
+                        aria-label="Zoom out">
+                    −
+                </button>
+
+                <button type="button"
+                        id="productZoomReset">
+                    100%
+                </button>
+
+                <button type="button"
+                        id="productZoomIn"
+                        aria-label="Zoom in">
+                    +
+                </button>
+
+                <span id="productLightboxCounter">
+                    1 / @productImageNames.Count
+                </span>
+
+            </div>
+
+        </div>
+    }
+
+
 </section>
+
+
+@section Scripts {
+    @if (hasProductImage)
+    {
+        <script>
+            (() => {
+                const gallery = document.getElementById("productDetailGallery");
+                const mainButton = document.getElementById("productGalleryMain");
+                const mainImage = document.getElementById("productGalleryMainImage");
+                const mainCounter = gallery.querySelector(".product-gallery-count");
+                const thumbnailElements = Array.from(
+                    gallery.querySelectorAll("[data-gallery-thumbnail]")
+                );
+                const imageSources = thumbnailElements.length > 0
+                    ? thumbnailElements.map(element => element.dataset.gallerySrc)
+                    : [mainButton.dataset.gallerySrc];
+                const lightbox = document.getElementById("productLightbox");
+                const lightboxImage = document.getElementById("productLightboxImage");
+                const lightboxStage = document.getElementById("productLightboxStage");
+                const closeButton = document.getElementById("productLightboxClose");
+                const previousButton = document.getElementById("productLightboxPrevious");
+                const nextButton = document.getElementById("productLightboxNext");
+                const zoomInButton = document.getElementById("productZoomIn");
+                const zoomOutButton = document.getElementById("productZoomOut");
+                const zoomResetButton = document.getElementById("productZoomReset");
+                const lightboxCounter = document.getElementById("productLightboxCounter");
+
+                // Keep the full-screen viewer outside the page section so its
+                // overflow and decorative layout can never crop the photo.
+                document.body.appendChild(lightbox);
+
+                let currentIndex = 0;
+                let zoomLevel = 1;
+                let previouslyFocusedElement = null;
+                let pointerPositionX = .5;
+                let pointerPositionY = .5;
+
+                const layoutLightboxImage = () => {
+                    if (!lightboxImage.naturalWidth ||
+                        !lightboxImage.naturalHeight ||
+                        lightbox.hidden)
+                    {
+                        return;
+                    }
+
+                    const stageWidth = lightboxStage.clientWidth;
+                    const stageHeight = lightboxStage.clientHeight;
+                    const safeMargin = window.innerWidth <= 768 ? 10 : 20;
+                    const availableWidth = Math.max(1, stageWidth - safeMargin * 2);
+                    const availableHeight = Math.max(1, stageHeight - safeMargin * 2);
+                    const fitScale = Math.min(
+                        availableWidth / lightboxImage.naturalWidth,
+                        availableHeight / lightboxImage.naturalHeight
+                    );
+                    const fittedWidth = lightboxImage.naturalWidth * fitScale;
+                    const fittedHeight = lightboxImage.naturalHeight * fitScale;
+                    const horizontalOverflow = Math.max(
+                        0,
+                        fittedWidth * zoomLevel - stageWidth
+                    );
+                    const verticalOverflow = Math.max(
+                        0,
+                        fittedHeight * zoomLevel - stageHeight
+                    );
+                    const horizontalShift =
+                        (.5 - pointerPositionX) * horizontalOverflow;
+                    const verticalShift =
+                        (.5 - pointerPositionY) * verticalOverflow;
+
+                    lightboxImage.style.width = `${fittedWidth}px`;
+                    lightboxImage.style.height = `${fittedHeight}px`;
+                    lightboxImage.style.left =
+                        `${(stageWidth - fittedWidth) / 2 + horizontalShift}px`;
+                    lightboxImage.style.top =
+                        `${(stageHeight - fittedHeight) / 2 + verticalShift}px`;
+                    lightboxImage.style.transformOrigin = "center center";
+
+                    if (zoomLevel === 1)
+                    {
+                        lightboxImage.style.removeProperty("transform");
+                    }
+                    else
+                    {
+                        lightboxImage.style.transform = `scale(${zoomLevel})`;
+                    }
+                };
+
+                const updateZoom = nextZoom => {
+                    zoomLevel = Math.min(4, Math.max(1, nextZoom));
+                    pointerPositionX = .5;
+                    pointerPositionY = .5;
+
+                    zoomResetButton.textContent = `${Math.round(zoomLevel * 100)}%`;
+                    lightboxStage.classList.toggle("is-zoomed", zoomLevel > 1);
+                    layoutLightboxImage();
+                };
+
+                const showImage = index => {
+                    currentIndex = (index + imageSources.length) % imageSources.length;
+                    const nextSource = imageSources[currentIndex];
+
+                    mainImage.src = nextSource;
+                    lightboxImage.src = nextSource;
+                    mainCounter.textContent = `${currentIndex + 1} / ${imageSources.length}`;
+                    lightboxCounter.textContent = `${currentIndex + 1} / ${imageSources.length}`;
+                    updateZoom(1);
+
+                    thumbnailElements.forEach((thumbnail, thumbnailIndex) => {
+                        const isActive = thumbnailIndex === currentIndex;
+                        thumbnail.classList.toggle("is-active", isActive);
+
+                        if (thumbnail.matches("button"))
+                        {
+                            thumbnail.setAttribute("aria-pressed", isActive.toString());
+                        }
+                    });
+                };
+
+                const openLightbox = () => {
+                    previouslyFocusedElement = document.activeElement;
+                    lightbox.hidden = false;
+                    document.body.classList.add("product-gallery-open");
+                    showImage(currentIndex);
+                    requestAnimationFrame(layoutLightboxImage);
+                    closeButton.focus();
+                };
+
+                const closeLightbox = () => {
+                    lightbox.hidden = true;
+                    document.body.classList.remove("product-gallery-open");
+                    updateZoom(1);
+
+                    if (previouslyFocusedElement)
+                    {
+                        previouslyFocusedElement.focus();
+                    }
+                };
+
+                thumbnailElements.forEach(thumbnail => {
+                    if (!thumbnail.matches("button"))
+                    {
+                        return;
+                    }
+
+                    thumbnail.addEventListener("click", () => {
+                        showImage(Number(thumbnail.dataset.galleryIndex));
+                    });
+                });
+
+                mainButton.addEventListener("click", openLightbox);
+                closeButton.addEventListener("click", closeLightbox);
+                zoomInButton.addEventListener("click", () => updateZoom(zoomLevel + .5));
+                zoomOutButton.addEventListener("click", () => updateZoom(zoomLevel - .5));
+                zoomResetButton.addEventListener("click", () => updateZoom(1));
+
+                if (previousButton)
+                {
+                    previousButton.addEventListener("click", () => showImage(currentIndex - 1));
+                    nextButton.addEventListener("click", () => showImage(currentIndex + 1));
+                }
+
+                lightboxStage.addEventListener("wheel", event => {
+                    event.preventDefault();
+                    updateZoom(zoomLevel + (event.deltaY < 0 ? .25 : -.25));
+                }, { passive: false });
+
+                lightboxStage.addEventListener("dblclick", () => {
+                    updateZoom(zoomLevel > 1 ? 1 : 2);
+                });
+
+                lightboxStage.addEventListener("pointermove", event => {
+                    if (zoomLevel <= 1)
+                    {
+                        return;
+                    }
+
+                    const stageBounds = lightboxStage.getBoundingClientRect();
+                    pointerPositionX = Math.min(
+                        1,
+                        Math.max(0, (event.clientX - stageBounds.left) / stageBounds.width)
+                    );
+                    pointerPositionY = Math.min(
+                        1,
+                        Math.max(0, (event.clientY - stageBounds.top) / stageBounds.height)
+                    );
+
+                    layoutLightboxImage();
+                });
+
+                lightboxImage.addEventListener("load", layoutLightboxImage);
+                window.addEventListener("resize", layoutLightboxImage);
+
+                lightbox.addEventListener("click", event => {
+                    if (event.target === lightbox)
+                    {
+                        closeLightbox();
+                    }
+                });
+
+                document.addEventListener("keydown", event => {
+                    if (lightbox.hidden)
+                    {
+                        return;
+                    }
+
+                    if (event.key === "Tab")
+                    {
+                        const focusableElements = Array.from(
+                            lightbox.querySelectorAll("button:not([disabled])")
+                        );
+                        const firstFocusableElement = focusableElements[0];
+                        const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+                        if (event.shiftKey && document.activeElement === firstFocusableElement)
+                        {
+                            event.preventDefault();
+                            lastFocusableElement.focus();
+                        }
+                        else if (!event.shiftKey && document.activeElement === lastFocusableElement)
+                        {
+                            event.preventDefault();
+                            firstFocusableElement.focus();
+                        }
+                    }
+
+                    if (event.key === "Escape") closeLightbox();
+                    if (event.key === "ArrowLeft" && imageSources.length > 1) showImage(currentIndex - 1);
+                    if (event.key === "ArrowRight" && imageSources.length > 1) showImage(currentIndex + 1);
+                    if (event.key === "+" || event.key === "=") updateZoom(zoomLevel + .5);
+                    if (event.key === "-") updateZoom(zoomLevel - .5);
+                });
+            })();
+        </script>
+    }
+}

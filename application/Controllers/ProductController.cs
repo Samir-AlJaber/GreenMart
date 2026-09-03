@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using GreenMart.Data;
 using GreenMart.Models;
+using Microsoft.AspNetCore.Hosting;
 
 namespace GreenMart.Controllers
 {
@@ -9,11 +10,18 @@ namespace GreenMart.Controllers
     {
 
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        private const long MaxProductImageBytes = 10 * 1024 * 1024;
+        private const int MaxProductImages = 8;
 
 
-        public ProductController(ApplicationDbContext context)
+        public ProductController(
+            ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
 
@@ -92,7 +100,10 @@ namespace GreenMart.Controllers
 
 
         [HttpPost]
-        public IActionResult Create(Product product)
+        [RequestSizeLimit(85 * 1024 * 1024)]
+        public IActionResult Create(
+            Product product,
+            List<IFormFile>? productImages)
         {
 
             if (User.Identity == null ||
@@ -104,6 +115,9 @@ namespace GreenMart.Controllers
                 );
             }
 
+
+
+            ValidateProductImages(productImages);
 
 
             if (!ModelState.IsValid)
@@ -147,6 +161,16 @@ namespace GreenMart.Controllers
             _context.Products.Add(product);
 
             _context.SaveChanges();
+
+
+            if (productImages != null &&
+                productImages.Count > 0)
+            {
+                SaveProductImages(
+                    productImages,
+                    product.ProductId
+                );
+            }
 
 
 
@@ -266,7 +290,10 @@ namespace GreenMart.Controllers
 
 
         [HttpPost]
-        public IActionResult Edit(Product product)
+        [RequestSizeLimit(85 * 1024 * 1024)]
+        public IActionResult Edit(
+            Product product,
+            List<IFormFile>? productImages)
         {
 
             if (User.Identity == null ||
@@ -305,6 +332,17 @@ namespace GreenMart.Controllers
             }
 
 
+            ValidateProductImages(productImages);
+
+
+            if (!ModelState.IsValid)
+            {
+                LoadCategories();
+
+                return View(product);
+            }
+
+
 
 
             existing.ProductName =
@@ -333,6 +371,16 @@ namespace GreenMart.Controllers
 
 
             _context.SaveChanges();
+
+
+            if (productImages != null &&
+                productImages.Count > 0)
+            {
+                ReplaceProductImages(
+                    productImages,
+                    existing.ProductId
+                );
+            }
 
 
 
@@ -416,6 +464,204 @@ namespace GreenMart.Controllers
                 _context.Categories
                 .Where(x => x.IsActive)
                 .ToList();
+
+        }
+
+
+
+        private void ValidateProductImages(
+            List<IFormFile>? productImages)
+        {
+
+            if (productImages == null ||
+                productImages.Count == 0)
+            {
+                return;
+            }
+
+
+            if (productImages.Count > MaxProductImages)
+            {
+                ModelState.AddModelError(
+                    "ProductImages",
+                    $"You can add up to {MaxProductImages} product photos."
+                );
+
+                return;
+            }
+
+
+            for (var index = 0;
+                 index < productImages.Count;
+                 index++)
+            {
+                var productImage =
+                    productImages[index];
+
+
+                if (productImage.Length == 0)
+                {
+                    ModelState.AddModelError(
+                        "ProductImages",
+                        $"Photo {index + 1} is empty or invalid."
+                    );
+
+                    continue;
+                }
+
+
+                if (productImage.Length > MaxProductImageBytes)
+                {
+                    ModelState.AddModelError(
+                        "ProductImages",
+                        $"Photo {index + 1} must be smaller than 10 MB."
+                    );
+
+                    continue;
+                }
+
+
+                if (!string.Equals(
+                        productImage.ContentType,
+                        "image/png",
+                        StringComparison.OrdinalIgnoreCase) ||
+                    !HasPngSignature(productImage))
+                {
+                    ModelState.AddModelError(
+                        "ProductImages",
+                        $"Photo {index + 1} could not be processed. Please choose it again."
+                    );
+                }
+            }
+
+        }
+
+
+
+        private static bool HasPngSignature(
+            IFormFile productImage)
+        {
+
+            byte[] expectedSignature =
+            {
+                137, 80, 78, 71,
+                13, 10, 26, 10
+            };
+
+            var actualSignature =
+                new byte[expectedSignature.Length];
+
+
+            using var stream =
+                productImage.OpenReadStream();
+
+            var bytesRead =
+                stream.Read(
+                    actualSignature,
+                    0,
+                    actualSignature.Length
+                );
+
+
+            return bytesRead == expectedSignature.Length &&
+                   actualSignature.SequenceEqual(
+                       expectedSignature
+                   );
+
+        }
+
+
+
+        private void SaveProductImages(
+            List<IFormFile> productImages,
+            int productId)
+        {
+
+            var imageDirectory =
+                Path.Combine(
+                    _webHostEnvironment.WebRootPath,
+                    "uploads",
+                    "products"
+                );
+
+
+            Directory.CreateDirectory(
+                imageDirectory
+            );
+
+
+            for (var index = 0;
+                 index < productImages.Count;
+                 index++)
+            {
+                var imagePath =
+                    Path.Combine(
+                        imageDirectory,
+                        $"product-{productId}-{index + 1}.png"
+                    );
+
+
+                using var fileStream =
+                    new FileStream(
+                        imagePath,
+                        FileMode.Create
+                    );
+
+
+                productImages[index].CopyTo(
+                    fileStream
+                );
+            }
+
+        }
+
+
+        private void ReplaceProductImages(
+            List<IFormFile> productImages,
+            int productId)
+        {
+
+            var imageDirectory =
+                Path.Combine(
+                    _webHostEnvironment.WebRootPath,
+                    "uploads",
+                    "products"
+                );
+
+
+            if (Directory.Exists(imageDirectory))
+            {
+                var numberedImages =
+                    Directory.GetFiles(
+                        imageDirectory,
+                        $"product-{productId}-*.png"
+                    );
+
+
+                foreach (var imagePath in numberedImages)
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+
+                var legacyImagePath =
+                    Path.Combine(
+                        imageDirectory,
+                        $"product-{productId}.png"
+                    );
+
+
+                if (System.IO.File.Exists(legacyImagePath))
+                {
+                    System.IO.File.Delete(legacyImagePath);
+                }
+            }
+
+
+            SaveProductImages(
+                productImages,
+                productId
+            );
 
         }
 
