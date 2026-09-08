@@ -279,87 +279,123 @@
     <div class="categories-grid">
 
 
-        <div class="category-card">
+        <a asp-controller="Product"
+           asp-action="Index"
+           asp-route-category="Electronics"
+           class="category-card"
+           aria-label="Browse Electronics products">
 
-            <div class="category-icon">
-                💻
+            <div class="category-image">
+                <img src="~/images/category-electronics-vintage.jpg"
+                     alt="A collection of reusable vintage radios displayed in an electronics shop"
+                     loading="lazy" />
             </div>
 
             <h3>
                 Electronics
             </h3>
 
-        </div>
+        </a>
 
 
 
-        <div class="category-card">
+        <a asp-controller="Product"
+           asp-action="Index"
+           asp-route-category="Fashion"
+           class="category-card"
+           aria-label="Browse Fashion products">
 
-            <div class="category-icon">
-                👕
+            <div class="category-image">
+                <img src="~/images/category-fashion-thrift.jpg"
+                     alt="Colorful pre-owned clothing displayed beside plants in a second-hand shop"
+                     loading="lazy" />
             </div>
 
             <h3>
                 Fashion
             </h3>
 
-        </div>
+        </a>
 
 
 
-        <div class="category-card">
+        <a asp-controller="Product"
+           asp-action="Index"
+           asp-route-category="Furniture"
+           class="category-card"
+           aria-label="Browse Furniture products">
 
-            <div class="category-icon">
-                🪑
+            <div class="category-image">
+                <img src="~/images/category-furniture-antique.jpg"
+                     alt="Reusable wooden chairs and cabinets displayed in an antique furniture shop"
+                     loading="lazy" />
             </div>
 
             <h3>
                 Furniture
             </h3>
 
-        </div>
+        </a>
 
 
 
-        <div class="category-card">
+        <a asp-controller="Product"
+           asp-action="Index"
+           asp-route-category="Books"
+           class="category-card"
+           aria-label="Browse Books products">
 
-            <div class="category-icon">
-                📚
+            <div class="category-image">
+                <img src="~/images/category-books-vintage.jpg"
+                     alt="Stacks of pre-owned books arranged in a warm second-hand bookshop"
+                     loading="lazy" />
             </div>
 
             <h3>
                 Books
             </h3>
 
-        </div>
+        </a>
 
 
 
-        <div class="category-card">
+        <a asp-controller="Product"
+           asp-action="Index"
+           asp-route-category="Food"
+           class="category-card"
+           aria-label="Browse Food products">
 
-            <div class="category-icon">
-                🍎
+            <div class="category-image">
+                <img src="~/images/category-food-market.jpg"
+                     alt="Fresh seasonal vegetables arranged at a local farmers market"
+                     loading="lazy" />
             </div>
 
             <h3>
                 Food
             </h3>
 
-        </div>
+        </a>
 
 
 
-        <div class="category-card">
+        <a asp-controller="Product"
+           asp-action="Index"
+           asp-route-category="Others"
+           class="category-card"
+           aria-label="Browse other products">
 
-            <div class="category-icon">
-                🌿
+            <div class="category-image">
+                <img src="~/images/category-others-flea.jpg"
+                     alt="A varied collection of reusable vintage items displayed at a flea market"
+                     loading="lazy" />
             </div>
 
             <h3>
                 Others
             </h3>
 
-        </div>
+        </a>
 
 
     </div>

@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<GreenMart.Models.Product>
 
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
+
 @{
     ViewData["Title"] = "My Products";
 }
@@ -84,8 +86,55 @@
             @foreach (var product in Model)
             {
 
+                var productImageDirectory = System.IO.Path.Combine(
+                    WebHostEnvironment.WebRootPath,
+                    "uploads",
+                    "products"
+                );
+
+                var productImagePaths =
+                    System.IO.Directory.Exists(productImageDirectory)
+                        ? System.IO.Directory.GetFiles(
+                            productImageDirectory,
+                            $"product-{product.ProductId}-*.png"
+                        ).OrderBy(path => path).ToList()
+                        : new List<string>();
+
+                var legacyImagePath = System.IO.Path.Combine(
+                    productImageDirectory,
+                    $"product-{product.ProductId}.png"
+                );
+
+                if (productImagePaths.Count == 0 &&
+                    System.IO.File.Exists(legacyImagePath))
+                {
+                    productImagePaths.Add(legacyImagePath);
+                }
+
+                var imageFileName = productImagePaths.Count > 0
+                    ? System.IO.Path.GetFileName(productImagePaths[0])
+                    : null;
+
+                var hasProductImage = imageFileName != null;
+
 
                 <div class="my-product-card">
+
+                    @if (hasProductImage)
+                    {
+                        <div class="my-product-image">
+                            <img src="~/uploads/products/@imageFileName"
+                                 alt="@product.ProductName"
+                                 loading="lazy" />
+
+                            @if (productImagePaths.Count > 1)
+                            {
+                                <span class="product-card-photo-count">
+                                    @productImagePaths.Count photos
+                                </span>
+                            }
+                        </div>
+                    }
 
 
 

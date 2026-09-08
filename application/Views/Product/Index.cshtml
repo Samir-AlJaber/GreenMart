@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<GreenMart.Models.Product>
 
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
+
 @{
     ViewData["Title"] = "Products";
 }
@@ -24,6 +26,13 @@
 
     </div>
 
+    <div id="activeCategoryFilter" class="active-category-filter" hidden>
+        <span>
+            Showing <strong id="activeCategoryName"></strong> listings
+        </span>
+        <a asp-controller="Product" asp-action="Index">View all products</a>
+    </div>
+
 
 
 
@@ -43,7 +52,7 @@
 
 
 
-            <h2>
+            <h2 id="emptyProductsTitle">
 
                 No Products Available
 
@@ -51,7 +60,7 @@
 
 
 
-            <p>
+            <p id="emptyProductsMessage">
 
                 There are currently no products listed on GreenMart.
 
@@ -96,14 +105,62 @@
     {
 
 
-        <div class="product-grid">
+        <div id="productGrid" class="product-grid">
 
 
             @foreach (var product in Model)
             {
 
+                var productImageDirectory = System.IO.Path.Combine(
+                    WebHostEnvironment.WebRootPath,
+                    "uploads",
+                    "products"
+                );
 
-                <div class="product-card-custom">
+                var productImagePaths =
+                    System.IO.Directory.Exists(productImageDirectory)
+                        ? System.IO.Directory.GetFiles(
+                            productImageDirectory,
+                            $"product-{product.ProductId}-*.png"
+                        ).OrderBy(path => path).ToList()
+                        : new List<string>();
+
+                var legacyImagePath = System.IO.Path.Combine(
+                    productImageDirectory,
+                    $"product-{product.ProductId}.png"
+                );
+
+                if (productImagePaths.Count == 0 &&
+                    System.IO.File.Exists(legacyImagePath))
+                {
+                    productImagePaths.Add(legacyImagePath);
+                }
+
+                var imageFileName = productImagePaths.Count > 0
+                    ? System.IO.Path.GetFileName(productImagePaths[0])
+                    : null;
+
+                var hasProductImage = imageFileName != null;
+
+
+                <div class="product-card-custom"
+                     data-category="@(product.Category?.CategoryName ?? string.Empty)">
+
+                    @if (hasProductImage)
+                    {
+                        <div class="product-card-image">
+                            <img src="~/uploads/products/@imageFileName"
+                                 alt="@product.ProductName"
+                                 loading="lazy" />
+
+                            @if (productImagePaths.Count > 1)
+                            {
+                                <span class="product-card-photo-count">
+                                    @productImagePaths.Count photos
+                                </span>
+                            }
+                        </div>
+                    }
 
 
                     <div class="product-category-tag">
@@ -219,9 +276,81 @@
 
         </div>
 
+        <div id="filteredEmptyProducts" class="empty-products" hidden>
+            <div class="empty-products-icon" aria-hidden="true">0</div>
+            <h2>No matching products yet</h2>
+            <p>
+                Sellers have not added an active product in this category yet.
+                Try another category or browse everything currently available.
+            </p>
+            <a asp-controller="Product"
+               asp-action="Index"
+               class="empty-products-btn">
+                View All Products
+            </a>
+        </div>
+
 
     }
 
 
 
 </section>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const selectedCategory = new URLSearchParams(window.location.search).get("category");
+
+            if (!selectedCategory || !selectedCategory.trim()) {
+                return;
+            }
+
+            const cleanCategory = selectedCategory.trim();
+            const normalizedCategory = cleanCategory.toLocaleLowerCase();
+            const filterBar = document.getElementById("activeCategoryFilter");
+            const filterName = document.getElementById("activeCategoryName");
+            const pageTitle = document.querySelector(".product-page-header h1");
+            const pageDescription = document.querySelector(".product-page-header p");
+            const productGrid = document.getElementById("productGrid");
+            const productCards = Array.from(document.querySelectorAll(".product-card-custom"));
+            const filteredEmpty = document.getElementById("filteredEmptyProducts");
+            const serverEmptyTitle = document.getElementById("emptyProductsTitle");
+            const serverEmptyMessage = document.getElementById("emptyProductsMessage");
+
+            filterName.textContent = cleanCategory;
+            filterBar.hidden = false;
+            pageTitle.textContent = cleanCategory + " Products";
+            pageDescription.textContent = "Browse active " + cleanCategory.toLocaleLowerCase() + " listings added by GreenMart sellers.";
+
+            if (!productCards.length) {
+                if (serverEmptyTitle) {
+                    serverEmptyTitle.textContent = "No " + cleanCategory + " Products Yet";
+                }
+
+                if (serverEmptyMessage) {
+                    serverEmptyMessage.textContent = "Sellers have not added an active product in this category yet.";
+                }
+
+                return;
+            }
+
+            let visibleProductCount = 0;
+
+            productCards.forEach(function (card) {
+                const cardCategory = (card.dataset.category || "").trim().toLocaleLowerCase();
+                const isMatch = cardCategory === normalizedCategory;
+                card.hidden = !isMatch;
+
+                if (isMatch) {
+                    visibleProductCount += 1;
+                }
+            });
+
+            if (visibleProductCount === 0) {
+                productGrid.hidden = true;
+                filteredEmpty.hidden = false;
+            }
+        });
+    </script>
+}
