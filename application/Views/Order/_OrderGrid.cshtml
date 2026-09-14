@@ -1,0 +1,232 @@
+@model IEnumerable<GreenMart.DTOs.OrderProductSearchResultDto>
+
+
+
+@if (Model == null || !Model.Any())
+{
+
+    <div class="empty-products">
+
+        <div class="empty-products-icon">
+
+            🛒
+
+        </div>
+
+
+        <h2>
+            No Orders Found
+        </h2>
+
+
+        <p>
+            @if (ViewBag.HasFilters == true)
+            {
+                @:No purchased products match your current search or filters.
+            }
+            else
+            {
+                @:You have not placed any orders yet.
+            }
+        </p>
+
+
+    </div>
+
+}
+
+else
+{
+
+
+    <div id="orderGrid"
+        class="product-grid order-grid">
+
+
+
+        @foreach(var product in Model)
+        {
+
+
+            <div class="product-card-custom order-card-custom">
+
+
+
+                <div class="product-card-image">
+
+
+                    @if(!string.IsNullOrEmpty(product.ImagePath))
+                    {
+
+                        <img src="@product.ImagePath"
+                             alt="@product.ProductName"
+                             loading="lazy" />
+
+                    }
+                    else
+                    {
+
+                        <div class="no-product-image">
+
+                            🌱
+
+                        </div>
+
+                    }
+
+
+                </div>
+
+
+
+
+                <div class="product-category-tag">
+
+                    @product.CategoryName
+
+                </div>
+
+
+
+
+                <h2>
+
+                    @product.ProductName
+
+                </h2>
+
+
+
+
+                <p class="product-brand-text">
+
+                    Brand:
+
+                    @(string.IsNullOrEmpty(product.Brand)
+                        ? "Not specified"
+                        : product.Brand)
+
+                </p>
+
+
+
+
+
+                <p class="product-description-text">
+
+                    @(string.IsNullOrEmpty(product.Description)
+                        ? "No description available."
+                        : product.Description)
+
+                </p>
+
+
+
+
+
+                <div class="product-info-box">
+
+
+                    <span>
+
+                        Quantity:
+
+                        @product.Quantity
+
+                    </span>
+
+
+
+                    <span>
+
+                        Price:
+
+                        ৳@(product.Price * product.Quantity)
+
+                    </span>
+
+
+                </div>
+
+
+
+
+
+                <div class="product-seller-text">
+
+
+                    Seller:
+
+                    @product.SellerName
+
+
+                    <br />
+
+
+                    Email:
+
+                    @product.SellerEmail
+
+
+                </div>
+
+
+
+
+
+                <div class="product-seller-text">
+
+
+                    Order Date:
+
+                    @product.OrderDate.ToString("dd MMM yyyy")
+
+
+                    <br />
+
+
+                    Status:
+
+                    @product.OrderStatus
+
+
+                </div>
+
+                    @if(product.OrderStatus == "Rejected")
+                    {
+
+                        <div class="product-seller-text">
+
+
+                            Rejection Reason:
+
+                            @(string.IsNullOrEmpty(product.RejectionReason)
+                                ? "Not specified"
+                                : product.RejectionReason)
+
+
+                            <br />
+
+
+                            Additional Note:
+
+                            @(string.IsNullOrEmpty(product.RejectionNote)
+                                ? "No additional note provided."
+                                : product.RejectionNote)
+
+
+                        </div>
+
+                    }
+
+
+                </div>
+
+
+        }
+
+
+    </div>
+
+
+}
