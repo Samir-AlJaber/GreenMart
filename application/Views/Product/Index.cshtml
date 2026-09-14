@@ -1,4 +1,4 @@
-﻿@model IEnumerable<GreenMart.DTOs.ProductSearchResultDto>
+@model IEnumerable<GreenMart.Models.Product>
 
 @{
     ViewData["Title"] = "Products";
@@ -24,212 +24,6 @@
 
     </div>
 
-    <div class="product-search-area listing-search"
-         data-suggestions-url="@Url.Action("Suggestions", "Product")"
-         data-results-url="@Url.Action("SearchResults", "Product")"
-         data-grid-target="#productListingResults"
-         data-item-url="/Product/Details/"
-         data-sort-target=".listing-sort"
-         data-category-target=".filter-category"
-         data-brand-target=".filter-brand"
-         data-min-price-target=".filter-min-price"
-         data-max-price-target=".filter-max-price"
-         data-stock-target=".filter-stock"
-         data-reset-target=".filter-reset">
-
-
-    <input type="text"
-       id="productSearchBox"
-       class="listing-search-input"
-       placeholder="Search products..."
-       autocomplete="off" />
-
-
-    <div id="searchSuggestions"
-        class="search-suggestions listing-search-suggestions">
-    </div>
-
-
-</div>
-
-                <div class="listing-filters">
-                    
-                    <div class="filter-group">
-
-                        <label>
-                            Category
-                        </label>
-
-
-                        <select class="filter-category">
-
-                            <option value="">
-                                All Categories
-                            </option>
-
-
-                            @foreach (var category in ViewBag.Categories ?? new List<GreenMart.Models.Category>())
-                            {
-
-                                <option value="@category.CategoryId">
-
-                                    @category.CategoryName
-
-                                </option>
-
-                            }
-
-                        </select>
-
-                    </div>
-                    
-                    <div class="filter-group">
-
-                        <label>
-                            Brand
-                        </label>
-
-
-                        <select class="filter-brand">
-
-                            <option value="">
-                                All Brands
-                            </option>
-
-
-                            @foreach (var brand in ViewBag.Brands ?? new List<string>())
-                            {
-
-                                <option value="@(brand == "Not specified" ? "__NONE__" : brand)">
-
-                                    @brand
-
-                                </option>
-
-                            }
-
-                        </select>
-
-                    </div>
-
-                    <div class="filter-group">
-
-                        <label>
-                            Min Price
-                        </label>
-
-                        <input type="number"
-                               class="filter-min-price"
-                               placeholder="Min" />
-
-                    </div>
-
-
-
-
-                    <div class="filter-group">
-
-                        <label>
-                            Max Price
-                        </label>
-
-                        <input type="number"
-                               class="filter-max-price"
-                               placeholder="Max" />
-
-                    </div>
-
-
-
-
-                    <div class="filter-group">
-
-                        <label>
-                            Availability
-                        </label>
-
-                        <select class="filter-stock">
-
-                            <option value="">
-                                All Products
-                            </option>
-
-
-                            <option value="true">
-                                In Stock
-                            </option>
-
-
-                            <option value="false">
-                                Out of Stock
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-
-                    <button type="button"
-                            class="filter-reset">
-
-                        Reset
-
-                    </button>
-
-
-                </div>
-                
-                <div class="listing-controls">
-
-                    <label>
-                        Sort:
-                    </label>
-
-
-                    <select class="listing-sort">
-
-                        <option value="">
-                            Newest
-                        </option>
-
-
-                        <option value="oldest">
-                            Oldest
-                        </option>
-
-
-                        <option value="price_low">
-                            Price Low → High
-                        </option>
-
-
-                        <option value="price_high">
-                            Price High → Low
-                        </option>
-
-
-                        <option value="name_az">
-                            Name A → Z
-                        </option>
-
-
-                        <option value="name_za">
-                            Name Z → A
-                        </option>
-
-
-                    </select>
-
-                </div>
-
-    <div id="activeCategoryFilter" class="active-category-filter" hidden>
-        <span>
-            Showing <strong id="activeCategoryName"></strong> listings
-        </span>
-        <a asp-controller="Product" asp-action="Index">View all products</a>
-    </div>
-
 
 
 
@@ -249,7 +43,7 @@
 
 
 
-            <h2 id="emptyProductsTitle">
+            <h2>
 
                 No Products Available
 
@@ -257,7 +51,7 @@
 
 
 
-            <p id="emptyProductsMessage">
+            <p>
 
                 There are currently no products listed on GreenMart.
 
@@ -302,25 +96,127 @@
     {
 
 
-        <div id="productListingResults">
+        <div class="product-grid">
 
-            <partial name="_ProductGrid"
-                     model="Model" />
 
-        </div>
+            @foreach (var product in Model)
+            {
 
-        <div id="filteredEmptyProducts" class="empty-products" hidden>
-            <div class="empty-products-icon" aria-hidden="true">0</div>
-            <h2>No matching products yet</h2>
-            <p>
-                Sellers have not added an active product in this category yet.
-                Try another category or browse everything currently available.
-            </p>
-            <a asp-controller="Product"
-               asp-action="Index"
-               class="empty-products-btn">
-                View All Products
-            </a>
+
+                <div class="product-card-custom">
+
+
+                    <div class="product-category-tag">
+
+                        @product.Category.CategoryName
+
+                    </div>
+
+
+
+
+
+                    <h2>
+
+                        @product.ProductName
+
+                    </h2>
+
+
+
+
+
+                    <p class="product-brand-text">
+
+                        Brand:
+                        @(string.IsNullOrEmpty(product.Brand)
+                            ? "Not specified"
+                            : product.Brand)
+
+                    </p>
+
+
+
+
+
+
+                    <p class="product-description-text">
+
+                        @(string.IsNullOrEmpty(product.Description)
+                        ? "No description available."
+                        : product.Description)
+
+                    </p>
+
+
+
+
+
+
+
+                    <div class="product-info-box">
+
+
+                        <span>
+
+                            Price:
+                            ৳@product.Price
+
+                        </span>
+
+
+
+                        <span>
+
+                            Stock:
+                            @product.StockQuantity
+
+                        </span>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="product-seller-text">
+
+
+                        Seller:
+
+                        @product.User.FullName
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <a asp-controller="Product"
+                       asp-action="Details"
+                       asp-route-id="@product.ProductId"
+                       class="product-details-btn">
+
+
+                        View Details
+
+
+                    </a>
+
+
+
+                </div>
+
+
+            }
+
+
         </div>
 
 
@@ -329,198 +225,3 @@
 
 
 </section>
-
-@section Scripts {
-
-    <script src="~/js/listing-search.js"></script>
-
-
-    <script>
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
-
-                const selectedCategory =
-                    new URLSearchParams(
-                        window.location.search
-                    ).get("category");
-
-
-                if (
-                    !selectedCategory ||
-                    !selectedCategory.trim()
-                ) {
-                    return;
-                }
-
-
-                const cleanCategory =
-                    selectedCategory.trim();
-
-
-                const normalizedCategory =
-                    cleanCategory.toLocaleLowerCase();
-
-
-                const filterBar =
-                    document.getElementById(
-                        "activeCategoryFilter"
-                    );
-
-
-                const filterName =
-                    document.getElementById(
-                        "activeCategoryName"
-                    );
-
-
-                const pageTitle =
-                    document.querySelector(
-                        ".product-page-header h1"
-                    );
-
-
-                const pageDescription =
-                    document.querySelector(
-                        ".product-page-header p"
-                    );
-
-
-                const productGrid =
-                    document.getElementById(
-                        "productGrid"
-                    );
-
-
-                const productCards =
-                    Array.from(
-                        document.querySelectorAll(
-                            ".product-card-custom"
-                        )
-                    );
-
-
-                const filteredEmpty =
-                    document.getElementById(
-                        "filteredEmptyProducts"
-                    );
-
-
-                const serverEmptyTitle =
-                    document.getElementById(
-                        "emptyProductsTitle"
-                    );
-
-
-                const serverEmptyMessage =
-                    document.getElementById(
-                        "emptyProductsMessage"
-                    );
-
-
-                if (filterName) {
-                    filterName.textContent =
-                        cleanCategory;
-                }
-
-
-                if (filterBar) {
-                    filterBar.hidden = false;
-                }
-
-
-                if (pageTitle) {
-                    pageTitle.textContent =
-                        cleanCategory + " Products";
-                }
-
-
-                if (pageDescription) {
-
-                    pageDescription.textContent =
-                        "Browse active "
-                        +
-                        cleanCategory.toLocaleLowerCase()
-                        +
-                        " listings added by GreenMart sellers.";
-
-                }
-
-
-                if (!productCards.length) {
-
-                    if (serverEmptyTitle) {
-
-                        serverEmptyTitle.textContent =
-                            "No "
-                            +
-                            cleanCategory
-                            +
-                            " Products Yet";
-
-                    }
-
-
-                    if (serverEmptyMessage) {
-
-                        serverEmptyMessage.textContent =
-                            "Sellers have not added an active product in this category yet.";
-
-                    }
-
-
-                    return;
-
-                }
-
-
-                let visibleProductCount = 0;
-
-
-                productCards.forEach(
-                    function (card) {
-
-                        const cardCategory =
-                            (
-                                card.dataset.category || ""
-                            )
-                            .trim()
-                            .toLocaleLowerCase();
-
-
-                        const isMatch =
-                            cardCategory ===
-                            normalizedCategory;
-
-
-                        card.hidden =
-                            !isMatch;
-
-
-                        if (isMatch) {
-                            visibleProductCount += 1;
-                        }
-
-                    }
-                );
-
-
-                if (
-                    visibleProductCount === 0 &&
-                    productGrid &&
-                    filteredEmpty
-                ) {
-
-                    productGrid.hidden = true;
-
-                    filteredEmpty.hidden = false;
-
-                }
-
-            }
-        );
-
-    </script>
-
-}

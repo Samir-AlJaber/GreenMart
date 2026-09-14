@@ -1,6 +1,4 @@
-﻿@model IEnumerable<GreenMart.Models.Product>
-
-@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
+@model IEnumerable<GreenMart.Models.Product>
 
 @{
     ViewData["Title"] = "My Products";
@@ -38,213 +36,9 @@
 
 
 
-    <div class="product-search-area listing-search"
-         data-suggestions-url="@Url.Action("MyProductSuggestions", "Product")"
-         data-results-url="@Url.Action("MyProductSearchResults", "Product")"
-         data-grid-target="#myProductListingResults"
-         data-item-url="/Product/Edit/"
-         data-sort-target=".listing-sort"
-         data-category-target=".filter-category"
-         data-brand-target=".filter-brand"
-         data-min-price-target=".filter-min-price"
-         data-max-price-target=".filter-max-price"
-         data-stock-target=".filter-stock"
-         data-reset-target=".filter-reset">
 
 
-        <input type="text"
-           id="myProductSearchBox"
-           class="listing-search-input"
-           placeholder="Search your products..."
-           autocomplete="off" />
 
-
-        <div id="myProductSearchSuggestions"
-             class="search-suggestions listing-search-suggestions">
-        </div>
-
-
-    </div>
-                        <div class="listing-filters">
-
-
-                        <div class="filter-group">
-
-                            <label>
-                                Category
-                            </label>
-
-
-                            <select class="filter-category">
-
-                                <option value="">
-                                    All Categories
-                                </option>
-
-
-                                @foreach (var category in ViewBag.Categories ?? new List<GreenMart.Models.Category>())
-                                {
-
-                                    <option value="@category.CategoryId">
-
-                                        @category.CategoryName
-
-                                    </option>
-
-                                }
-
-                            </select>
-
-                        </div>
-
-
-
-                        <div class="filter-group">
-
-                            <label>
-                                Brand
-                            </label>
-
-
-                            <select class="filter-brand">
-
-                                <option value="">
-                                    All Brands
-                                </option>
-
-
-                                @foreach (var brand in ViewBag.Brands ?? new List<string>())
-                                {
-
-                                    <option value="@(brand == "Not specified" ? "__NONE__" : brand)">
-
-                                        @brand
-
-                                    </option>
-
-                                }
-
-                            </select>
-
-                        </div>
-
-
-
-                        <div class="filter-group">
-
-                            <label>
-                                Min Price
-                            </label>
-
-
-                            <input type="number"
-                                   class="filter-min-price"
-                                   placeholder="Min" />
-
-                        </div>
-
-
-
-
-                        <div class="filter-group">
-
-                            <label>
-                                Max Price
-                            </label>
-
-
-                            <input type="number"
-                                   class="filter-max-price"
-                                   placeholder="Max" />
-
-                        </div>
-
-
-
-
-                        <div class="filter-group">
-
-                            <label>
-                                Availability
-                            </label>
-
-
-                            <select class="filter-stock">
-
-                                <option value="">
-                                    All Products
-                                </option>
-
-
-                                <option value="true">
-                                    In Stock
-                                </option>
-
-
-                                <option value="false">
-                                    Out of Stock
-                                </option>
-
-
-                            </select>
-
-                        </div>
-
-
-
-
-                        <button type="button"
-                                class="filter-reset">
-
-                            Reset
-
-                        </button>
-
-
-                    </div>
-
-                <div class="listing-controls">
-
-                    <label>
-                        Sort:
-                    </label>
-
-
-                    <select class="listing-sort">
-
-                        <option value="">
-                            Newest
-                        </option>
-
-
-                        <option value="oldest">
-                            Oldest
-                        </option>
-
-
-                        <option value="price_low">
-                            Price Low → High
-                        </option>
-
-
-                        <option value="price_high">
-                            Price High → Low
-                        </option>
-
-
-                        <option value="name_az">
-                            Name A → Z
-                        </option>
-
-
-                        <option value="name_za">
-                            Name Z → A
-                        </option>
-
-
-                    </select>
-
-                </div>
 
     @if (!Model.Any())
     {
@@ -278,17 +72,156 @@
 
 
     }
-
     else
     {
-        <div id="myProductListingResults">
 
-            <partial name="_MyProductGrid"
-                     model="Model" />
+
+
+        <div class="my-products-grid">
+
+
+
+            @foreach (var product in Model)
+            {
+
+
+                <div class="my-product-card">
+
+
+
+                    <div class="my-product-category">
+
+
+                        @product.Category.CategoryName
+
+
+                    </div>
+
+
+
+
+
+
+                    <h2>
+
+                        @product.ProductName
+
+                    </h2>
+
+                    <p class="my-product-brand">
+
+                        Brand:
+                        @(string.IsNullOrEmpty(product.Brand)
+                            ? "Not specified"
+                            : product.Brand)
+
+                    </p>
+
+
+                    <p>
+
+                        Price:
+                        ৳@product.Price
+
+                    </p>
+
+
+
+
+
+
+                    <p>
+
+                        Stock:
+                        @product.StockQuantity
+
+                    </p>
+
+
+
+
+
+
+                    <p>
+
+                        Status:
+
+                        @(product.IsActive
+                            ? "Active"
+                            : "Inactive")
+
+                    </p>
+
+
+
+
+
+
+
+
+                    <div class="my-product-actions">
+
+
+
+
+
+                        <a asp-controller="Product"
+                           asp-action="Details"
+                           asp-route-id="@product.ProductId">
+
+                            View
+
+                        </a>
+
+
+
+
+
+
+
+                        <a asp-controller="Product"
+                           asp-action="Edit"
+                           asp-route-id="@product.ProductId">
+
+                            Edit
+
+                        </a>
+
+
+
+
+
+
+
+                        <button type="button"
+                                onclick="showDeletePopup(@product.ProductId)"
+                                class="product-delete-btn">
+
+                            Delete
+
+                        </button>
+
+
+
+
+
+                    </div>
+
+
+
+                </div>
+
+
+            }
+
+
 
         </div>
 
+
     }
+
+
 
 </section>
 
@@ -368,35 +301,34 @@
 </div>
 
 
-@section Scripts {
-
-    <script src="~/js/listing-search.js"></script>
+<script>
 
 
-    <script>
+    function showDeletePopup(id) {
 
-        function showDeletePopup(id) {
-
-            document
-                .getElementById("deleteProductId")
-                .value = id;
+        document
+            .getElementById("deleteProductId")
+            .value = id;
 
 
-            document
-                .getElementById("deletePopup")
-                .style.display = "flex";
 
-        }
+        document
+            .getElementById("deletePopup")
+            .style.display = "flex";
+
+    }
 
 
-        function hideDeletePopup() {
 
-            document
-                .getElementById("deletePopup")
-                .style.display = "none";
 
-        }
 
-    </script>
+    function hideDeletePopup() {
 
-}
+        document
+            .getElementById("deletePopup")
+            .style.display = "none";
+
+    }
+
+
+</script>

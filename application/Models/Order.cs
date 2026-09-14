@@ -33,6 +33,11 @@ namespace GreenMart.Models
         public string? ShippingAddress { get; set; }
 
 
+        public string? RejectionReason { get; set; }
+
+
+        public string? RejectionNote { get; set; }
+
 
         public DateTime CreatedAt { get; set; }
             = DateTime.Now;

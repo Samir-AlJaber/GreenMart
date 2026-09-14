@@ -2,59 +2,42 @@
     ViewData["Title"] = "Home";
 }
 
-
 <section class="hero-section">
-
 
     <div class="hero-content">
 
-
         <div class="hero-badge">
-
             🌱 Sustainable Marketplace
-
         </div>
 
 
-
-        @if (User.Identity != null &&
-             User.Identity.IsAuthenticated)
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
         {
 
-
             <h1>
-
                 Welcome Back,
-
                 <span>
                     @User.Identity.Name
                 </span>
-
             </h1>
 
 
-
             <p>
-
                 Continue your GreenMart journey.
                 Discover products, manage your account,
-                and connect with buyers and sellers.
-
+                and grow with our sustainable marketplace.
             </p>
-
 
 
             <div class="hero-buttons">
 
 
-                <a asp-controller="Product"
-                   asp-action="Index"
+                <a href="#"
                    class="hero-btn primary">
 
                     Explore Products
 
                 </a>
-
 
 
                 <a asp-controller="Account"
@@ -68,41 +51,28 @@
 
             </div>
 
-
         }
         else
         {
 
-
             <h1>
-
                 Shop Smarter.
-
                 <span>
                     Live Greener.
                 </span>
-
             </h1>
 
 
-
-
             <p>
-
                 GreenMart is a modern marketplace where people can buy,
-                sell, exchange, and discover products in a smarter
-                and sustainable way.
-
+                sell, and discover products in a smarter and sustainable way.
             </p>
-
-
 
 
             <div class="hero-buttons">
 
 
-                <a asp-controller="Product"
-                   asp-action="Index"
+                <a href="#"
                    class="hero-btn primary">
 
                     Explore Products
@@ -122,315 +92,203 @@
 
             </div>
 
-
         }
-
 
     </div>
 
 
-
     <div class="hero-decoration circle-one"></div>
-
     <div class="hero-decoration circle-two"></div>
-
 
 </section>
 
 
-
-
-
 <section class="features-section">
-
 
     <div class="feature-card">
 
-
         <div class="feature-icon">
-
             🛒
-
         </div>
-
 
         <h3>
             Buy Products
         </h3>
 
-
         <p>
             Discover quality products from trusted sellers.
         </p>
 
-
     </div>
-
-
 
 
     <div class="feature-card">
 
-
         <div class="feature-icon">
-
             📦
-
         </div>
-
 
         <h3>
             Sell Products
         </h3>
 
-
         <p>
-            Create listings and manage your own products.
+            Create listings and grow your marketplace presence.
         </p>
-
 
     </div>
 
 
-
-
     <div class="feature-card">
 
-
         <div class="feature-icon">
-
             🔒
-
         </div>
-
 
         <h3>
             Secure Platform
         </h3>
 
-
         <p>
             Safe accounts and reliable transactions.
         </p>
 
-
     </div>
-
-
 
 
     <div class="feature-card">
 
-
         <div class="feature-icon">
-
             🌍
-
         </div>
-
 
         <h3>
             Green Community
         </h3>
 
-
         <p>
-            Connect buyers and sellers easily.
+            Connect with buyers and sellers easily.
         </p>
-
 
     </div>
 
-
 </section>
-
-
-
-
 
 <section class="categories-section">
 
-
     <div class="section-title">
-
 
         <span>
             Explore Categories
         </span>
 
-
-
         <h2>
             Find Everything You Need
         </h2>
-
-
 
         <p>
             Browse different categories and discover amazing products.
         </p>
 
-
     </div>
-
-
 
 
     <div class="categories-grid">
 
 
-        <a asp-controller="Product"
-           asp-action="Index"
-           asp-route-category="Electronics"
-           class="category-card"
-           aria-label="Browse Electronics products">
-
-            <div class="category-image">
-                <img src="~/images/category-electronics-vintage.jpg"
-                     alt="A collection of reusable vintage radios displayed in an electronics shop"
-                     loading="lazy" />
+        <div class="category-card">
+            <div class="category-icon">
+                💻
             </div>
 
             <h3>
                 Electronics
             </h3>
-
-        </a>
-
+        </div>
 
 
-        <a asp-controller="Product"
-           asp-action="Index"
-           asp-route-category="Fashion"
-           class="category-card"
-           aria-label="Browse Fashion products">
 
-            <div class="category-image">
-                <img src="~/images/category-fashion-thrift.jpg"
-                     alt="Colorful pre-owned clothing displayed beside plants in a second-hand shop"
-                     loading="lazy" />
+        <div class="category-card">
+            <div class="category-icon">
+                👕
             </div>
 
             <h3>
                 Fashion
             </h3>
-
-        </a>
-
+        </div>
 
 
-        <a asp-controller="Product"
-           asp-action="Index"
-           asp-route-category="Furniture"
-           class="category-card"
-           aria-label="Browse Furniture products">
 
-            <div class="category-image">
-                <img src="~/images/category-furniture-antique.jpg"
-                     alt="Reusable wooden chairs and cabinets displayed in an antique furniture shop"
-                     loading="lazy" />
+        <div class="category-card">
+            <div class="category-icon">
+                🪑
             </div>
 
             <h3>
                 Furniture
             </h3>
-
-        </a>
-
+        </div>
 
 
-        <a asp-controller="Product"
-           asp-action="Index"
-           asp-route-category="Books"
-           class="category-card"
-           aria-label="Browse Books products">
 
-            <div class="category-image">
-                <img src="~/images/category-books-vintage.jpg"
-                     alt="Stacks of pre-owned books arranged in a warm second-hand bookshop"
-                     loading="lazy" />
+        <div class="category-card">
+            <div class="category-icon">
+                📚
             </div>
 
             <h3>
                 Books
             </h3>
-
-        </a>
-
+        </div>
 
 
-        <a asp-controller="Product"
-           asp-action="Index"
-           asp-route-category="Food"
-           class="category-card"
-           aria-label="Browse Food products">
 
-            <div class="category-image">
-                <img src="~/images/category-food-market.jpg"
-                     alt="Fresh seasonal vegetables arranged at a local farmers market"
-                     loading="lazy" />
+        <div class="category-card">
+            <div class="category-icon">
+                🍎
             </div>
 
             <h3>
                 Food
             </h3>
-
-        </a>
-
+        </div>
 
 
-        <a asp-controller="Product"
-           asp-action="Index"
-           asp-route-category="Others"
-           class="category-card"
-           aria-label="Browse other products">
 
-            <div class="category-image">
-                <img src="~/images/category-others-flea.jpg"
-                     alt="A varied collection of reusable vintage items displayed at a flea market"
-                     loading="lazy" />
+        <div class="category-card">
+            <div class="category-icon">
+                🌿
             </div>
 
             <h3>
                 Others
             </h3>
-
-        </a>
+        </div>
 
 
     </div>
 
-
 </section>
-
-
-
-
 
 <section class="how-section">
 
 
     <div class="section-title">
 
-
         <span>
             Simple Process
         </span>
-
 
         <h2>
             How GreenMart Works
         </h2>
 
-
         <p>
             A simple and secure way to buy and sell products.
         </p>
 
-
     </div>
-
-
 
 
 
@@ -439,84 +297,65 @@
 
         <div class="step-card">
 
-
             <div class="step-number">
                 01
             </div>
-
 
             <div class="step-icon">
                 👤
             </div>
 
-
             <h3>
                 Create Account
             </h3>
-
 
             <p>
                 Register and create your GreenMart profile.
             </p>
 
-
         </div>
 
 
 
-
-
         <div class="step-card">
-
 
             <div class="step-number">
                 02
             </div>
 
-
             <div class="step-icon">
                 🛍️
             </div>
-
 
             <h3>
                 Buy or Sell
             </h3>
 
-
             <p>
                 Discover products or create your own listings.
             </p>
-
 
         </div>
 
 
 
-
-
         <div class="step-card">
-
 
             <div class="step-number">
                 03
             </div>
 
-
             <div class="step-icon">
                 🤝
             </div>
-
 
             <h3>
                 Connect & Grow
             </h3>
 
-
             <p>
                 Complete transactions and build connections.
             </p>
-
 
         </div>
 
@@ -526,39 +365,26 @@
 
 </section>
 
-
-
-
-
 <section class="cta-section">
 
 
     <div class="cta-content">
 
 
-
         @if (User.Identity != null &&
-             User.Identity.IsAuthenticated)
+           User.Identity.IsAuthenticated)
         {
 
-
             <h2>
-
                 Ready to Continue,
                 @User.Identity.Name?
-
             </h2>
 
 
-
             <p>
-
-                Explore products, manage your profile,
+                Explore new products, manage your profile,
                 and continue your GreenMart journey.
-
             </p>
-
-
 
 
             <div class="cta-buttons">
@@ -573,10 +399,7 @@
                 </a>
 
 
-
-
-                <a asp-controller="Product"
-                   asp-action="Index"
+                <a href="#"
                    class="cta-secondary">
 
                     Explore Products
@@ -597,14 +420,10 @@
             </h2>
 
 
-
             <p>
-
                 Start your journey today and become part of
                 a smarter, greener marketplace.
-
             </p>
-
 
 
 
@@ -621,9 +440,7 @@
 
 
 
-
-                <a asp-controller="Product"
-                   asp-action="Index"
+                <a href="#"
                    class="cta-secondary">
 
                     Explore Products
@@ -635,7 +452,6 @@
 
 
         }
-
 
     </div>
 

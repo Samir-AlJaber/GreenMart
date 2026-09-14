@@ -59,7 +59,28 @@ namespace GreenMart.Controllers
 
 
 
+        [HttpGet]
+        public IActionResult CartCount()
+        {
+            var userId =
+                int.Parse(
+                    User.FindFirst("UserId").Value
+                );
 
+
+            var count =
+                _context.CartItems
+                .Include(x => x.Cart)
+                .Count(
+                    x => x.Cart.UserId == userId
+                );
+
+
+            return Json(new
+            {
+                count = count
+            });
+        }
 
 
 
