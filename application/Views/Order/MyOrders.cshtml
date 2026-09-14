@@ -1,0 +1,386 @@
+@model IEnumerable<GreenMart.DTOs.OrderProductSearchResultDto>
+
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+
+
+<section class="orders-page">
+
+
+    <div class="orders-header">
+
+        <h1>
+            My Orders
+        </h1>
+
+
+        <p>
+            Track and manage your purchased products.
+        </p>
+
+    </div>
+
+
+
+    <div class="product-search-area listing-search history-search"
+         data-history-type="buyer"
+         data-suggestions-url="@Url.Action("OrderSuggestions", "Order")"
+         data-results-url="@Url.Action("OrderSearchResults", "Order")"
+         data-grid-target="#orderGrid"
+         data-item-url="/Product/Details/"
+         data-sort-target=".listing-sort"
+         data-category-target=".filter-category"
+         data-brand-target=".filter-brand"
+         data-min-price-target=".filter-min-price"
+         data-max-price-target=".filter-max-price"
+         data-stock-target=""
+         data-reset-target=".filter-reset"
+         data-seller-target=".filter-seller"
+         data-status-target=".filter-status"
+         data-from-date-target=".filter-from-date"
+         data-to-date-target=".filter-to-date"
+         data-price-target=".filter-total-price">
+
+
+
+        <input type="text"
+               id="orderSearchBox"
+               class="listing-search-input"
+               placeholder="Search purchased products..."
+               autocomplete="off" />
+
+
+        <div class="search-suggestions listing-search-suggestions">
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <div class="listing-filters">
+
+
+
+        <div class="filter-group">
+
+            <label>
+                Category
+            </label>
+
+
+            <select class="filter-category">
+
+
+                <option value="">
+                    All Categories
+                </option>
+
+
+
+                @foreach(var category in ViewBag.Categories)
+                {
+
+                    <option value="@category.CategoryId">
+
+                        @category.CategoryName
+
+                    </option>
+
+                }
+
+
+            </select>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+
+            <label>
+                Brand
+            </label>
+
+
+            <select class="filter-brand">
+
+
+                <option value="">
+                    All Brands
+                </option>
+
+
+
+                @foreach(var brand in ViewBag.Brands)
+                {
+
+                    <option value="@brand">
+
+                        @brand
+
+                    </option>
+
+                }
+
+
+            </select>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+
+            <label>
+                Seller
+            </label>
+
+
+            <select class="filter-seller">
+
+
+                <option value="">
+                    All Sellers
+                </option>
+
+
+                @foreach(var seller in ViewBag.Sellers)
+                {
+
+                    <option value="@seller">
+
+                        @seller
+
+                    </option>
+
+                }
+
+
+            </select>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                Min Price
+            </label>
+
+
+            <input type="number"
+                   class="filter-min-price"
+                   placeholder="Min" />
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                Max Price
+            </label>
+
+
+            <input type="number"
+                   class="filter-max-price"
+                   placeholder="Max" />
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                Status
+            </label>
+
+
+            <select class="filter-status">
+
+
+                <option value="">
+                    All Status
+                </option>
+
+
+                @foreach(var status in ViewBag.AvailableStatuses)
+                {
+
+                    <option value="@status">
+                        @status
+                    </option>
+
+                }
+
+
+            </select>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                From Date
+            </label>
+
+
+            <input type="date"
+               class="filter-from-date"
+               onkeydown="return false;" />
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                To Date
+            </label>
+
+
+            <input type="date"
+               class="filter-to-date"
+               onkeydown="return false;" />
+
+
+        </div>
+
+
+
+
+
+        <button type="button"
+                class="filter-reset">
+
+            Reset
+
+        </button>
+
+
+
+    </div>
+
+
+
+
+
+    <div class="listing-controls">
+
+
+        <label>
+            Sort:
+        </label>
+
+
+        <select class="listing-sort">
+
+
+            <option value="">
+                Newest Purchase
+            </option>
+
+
+            <option value="oldest">
+                Oldest Purchase
+            </option>
+
+
+            <option value="price_low">
+                Price Low → High
+            </option>
+
+
+            <option value="price_high">
+                Price High → Low
+            </option>
+
+
+            <option value="name_az">
+                Product Name A → Z
+            </option>
+
+
+            <option value="name_za">
+                Product Name Z → A
+            </option>
+
+
+            <option value="seller_az">
+                Seller Name A → Z
+            </option>
+
+
+        </select>
+
+
+    </div>
+
+
+
+
+
+    <div id="orderListingResults">
+
+        <div id="orderGrid">
+
+            <partial name="_OrderGrid"
+                     model="Model" />
+
+        </div>
+
+    </div>
+
+
+
+</section>
+
+
+
+
+@section Scripts {
+
+    <script src="~/js/listing-search.js" asp-append-version="true"></script>
+
+}

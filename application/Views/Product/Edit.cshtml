@@ -248,7 +248,7 @@
 
             </div>
 
-            <button type="submit"
+            <button type="button"
                     class="product-submit-btn"
                     id="productSubmitButton">
                 Save Changes
@@ -260,10 +260,275 @@
 
 </section>
 
+<div class="product-update-overlay"
+     id="productUpdateOverlay"
+     style="display:none;">
+
+    <div class="product-update-box">
+
+        <h3>
+            Confirm Update
+        </h3>
+
+        <p>
+            Are you sure you want to update this product?
+        </p>
+
+
+        <div class="product-update-buttons">
+
+            <button type="button"
+                    id="cancelUpdateButton">
+                Cancel
+            </button>
+
+
+            <button type="button"
+                    id="confirmUpdateButton">
+                Confirm Update
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="product-update-success"
+     id="productUpdateSuccess"
+     style="display:none;">
+
+    Product updated successfully.
+
+</div>
+
+<div class="product-update-info"
+     id="productUpdateInfo"
+     style="display:none;">
+
+    No changes detected.
+
+</div>
+
 @section Scripts {
 
     <partial name="_ValidationScriptsPartial" />
+
     <script src="~/js/product-image-editor.js" asp-append-version="true"></script>
+
     <script src="~/js/product-image-uploader.js" asp-append-version="true"></script>
+
+
+    <script>
+
+
+    const productForm =
+        document.getElementById("productForm");
+
+
+    const updateButton =
+        document.getElementById("productSubmitButton");
+
+
+    const updateOverlay =
+        document.getElementById("productUpdateOverlay");
+
+
+    const cancelUpdate =
+        document.getElementById("cancelUpdateButton");
+
+
+    const confirmUpdate =
+        document.getElementById("confirmUpdateButton");
+
+
+    const successMessage =
+        document.getElementById("productUpdateSuccess");
+
+    const infoMessage =
+    document.getElementById("productUpdateInfo");
+
+    const initialValues =
+    {
+        ProductName:
+            document.getElementById("ProductName").value,
+
+        Brand:
+            document.getElementById("Brand").value,
+
+        CategoryId:
+            document.getElementById("CategoryId").value,
+
+        Description:
+            document.getElementById("Description").value,
+
+        Price:
+            document.getElementById("Price").value,
+
+        StockQuantity:
+            document.getElementById("StockQuantity").value
+    };
+
+
+
+
+
+    function hasProductChanged()
+    {
+
+        if(
+            initialValues.ProductName !==
+            document.getElementById("ProductName").value
+        )
+            return true;
+
+
+
+        if(
+            initialValues.Brand !==
+            document.getElementById("Brand").value
+        )
+            return true;
+
+
+
+        if(
+            initialValues.CategoryId !==
+            document.getElementById("CategoryId").value
+        )
+            return true;
+
+
+
+        if(
+            initialValues.Description !==
+            document.getElementById("Description").value
+        )
+            return true;
+
+
+
+        if(
+            initialValues.Price !==
+            document.getElementById("Price").value
+        )
+            return true;
+
+
+
+        if(
+            initialValues.StockQuantity !==
+            document.getElementById("StockQuantity").value
+        )
+            return true;
+
+
+
+        const imageInput =
+            document.getElementById("ProductImages");
+
+
+        if(
+            imageInput &&
+            imageInput.files.length > 0
+        )
+        {
+            return true;
+        }
+
+
+
+        return false;
+
+    }
+
+
+
+
+
+
+    updateButton.addEventListener(
+        "click",
+        function()
+        {
+
+            if(!hasProductChanged())
+            {
+
+                infoMessage.style.display =
+                    "block";
+
+
+                setTimeout(
+                    function()
+                    {
+                        infoMessage.style.display =
+                            "none";
+
+                    },
+                    2500
+                );
+
+
+                return;
+            }
+
+
+            updateOverlay.style.display =
+                "flex";
+
+        }
+    );
+
+
+
+
+
+
+    cancelUpdate.addEventListener(
+        "click",
+        function()
+        {
+
+            updateOverlay.style.display =
+                "none";
+
+        }
+    );
+
+
+
+
+
+
+    confirmUpdate.addEventListener(
+    "click",
+    function()
+    {
+
+        updateOverlay.style.display =
+            "none";
+
+
+        successMessage.style.display =
+            "block";
+
+
+        setTimeout(
+            function()
+            {
+                productForm.submit();
+
+            },
+            3000
+        );
+
+    }
+);
+
+
+
+    </script>
 
 }

@@ -1,0 +1,528 @@
+@model IEnumerable<GreenMart.DTOs.OrderProductSearchResultDto>
+
+@{
+    ViewData["Title"] = "Order History";
+}
+
+
+
+<section class="orders-page">
+
+
+    <div class="orders-header">
+
+        <h1>
+            Order History
+        </h1>
+
+
+        <p>
+            Track and manage orders received for your products.
+        </p>
+
+    </div>
+
+
+
+    <div class="product-search-area listing-search history-search"
+         data-history-type="owner"
+         data-suggestions-url="@Url.Action("OwnerOrderSuggestions", "Order")"
+         data-results-url="@Url.Action("OwnerOrderSearchResults", "Order")"
+         data-grid-target="#orderGrid"
+         data-item-url="/Product/Details/"
+         data-sort-target=".listing-sort"
+         data-category-target=".filter-category"
+         data-brand-target=".filter-brand"
+         data-min-price-target=".filter-min-price"
+         data-max-price-target=".filter-max-price"
+         data-stock-target=""
+         data-reset-target=".filter-reset"
+         data-seller-target=".filter-buyer"
+         data-status-target=".filter-status"
+         data-from-date-target=".filter-from-date"
+         data-to-date-target=".filter-to-date"
+         data-price-target=".filter-total-price">
+
+
+
+        <input type="text"
+               id="orderSearchBox"
+               class="listing-search-input"
+               placeholder="Search received orders..."
+               autocomplete="off" />
+
+
+        <div class="search-suggestions listing-search-suggestions">
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <div class="listing-filters">
+
+
+
+        <div class="filter-group">
+
+            <label>
+                Category
+            </label>
+
+
+            <select class="filter-category">
+
+
+                <option value="">
+                    All Categories
+                </option>
+
+
+
+                @foreach(var category in ViewBag.Categories)
+                {
+
+                    <option value="@category.CategoryId">
+
+                        @category.CategoryName
+
+                    </option>
+
+                }
+
+
+            </select>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+
+            <label>
+                Brand
+            </label>
+
+
+            <select class="filter-brand">
+
+
+                <option value="">
+                    All Brands
+                </option>
+
+
+
+                @foreach(var brand in ViewBag.Brands)
+                {
+
+                    <option value="@brand">
+
+                        @brand
+
+                    </option>
+
+                }
+
+
+            </select>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+
+            <label>
+                Buyer
+            </label>
+
+
+            <select class="filter-buyer">
+
+
+                <option value="">
+                    All Buyers
+                </option>
+
+
+                @foreach(var buyer in ViewBag.Buyers)
+                {
+
+                    <option value="@buyer">
+
+                        @buyer
+
+                    </option>
+
+                }
+
+
+            </select>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                Min Price
+            </label>
+
+
+            <input type="number"
+                   class="filter-min-price"
+                   placeholder="Min" />
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                Max Price
+            </label>
+
+
+            <input type="number"
+                   class="filter-max-price"
+                   placeholder="Max" />
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                Status
+            </label>
+
+
+            <select class="filter-status">
+
+                <option value="">
+                    All Status
+                </option>
+
+
+                @foreach(var status in ViewBag.AvailableStatuses)
+                {
+
+                    <option value="@status">
+                        @status
+                    </option>
+
+                }
+
+
+            </select>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                From Date
+            </label>
+
+
+            <input type="date"
+                   class="filter-from-date"
+                   onkeydown="return false;" />
+
+
+        </div>
+
+
+
+
+
+
+        <div class="filter-group">
+
+            <label>
+                To Date
+            </label>
+
+
+            <input type="date"
+                   class="filter-to-date"
+                   onkeydown="return false;" />
+
+
+        </div>
+
+
+
+
+
+        <button type="button"
+                class="filter-reset">
+
+            Reset
+
+        </button>
+
+
+
+    </div>
+
+
+
+
+
+    <div class="listing-controls">
+
+
+        <label>
+            Sort:
+        </label>
+
+
+        <select class="listing-sort">
+
+
+            <option value="">
+                Newest Order
+            </option>
+
+
+            <option value="oldest">
+                Oldest Order
+            </option>
+
+
+            <option value="price_low">
+                Price Low → High
+            </option>
+
+
+            <option value="price_high">
+                Price High → Low
+            </option>
+
+
+            <option value="name_az">
+                Product Name A → Z
+            </option>
+
+
+            <option value="name_za">
+                Product Name Z → A
+            </option>
+
+
+            <option value="buyer_az">
+                Buyer Name A → Z
+            </option>
+
+
+        </select>
+
+
+    </div>
+
+
+
+
+
+    <div id="orderListingResults">
+
+        <div id="orderGrid">
+
+            <partial name="_OwnerOrderGrid"
+                     model="Model" />
+
+        </div>
+
+    </div>
+
+
+
+</section>
+
+<div class="order-confirm-overlay"
+     id="confirmOrderModal">
+
+
+    <div class="order-confirm-box">
+
+
+        <h3>
+            Confirm Order
+        </h3>
+
+
+        <p>
+            Are you sure you want to accept this order?
+        </p>
+
+
+        <div class="order-modal-buttons">
+
+
+            <button type="button"
+                    class="order-cancel-modal">
+
+                Cancel
+
+            </button>
+
+
+            <button type="button"
+                    class="order-confirm-modal">
+
+                Confirm Order
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="order-reject-overlay"
+     id="rejectOrderModal">
+
+
+    <div class="order-reject-box">
+
+
+        <h3>
+            Reject Order
+        </h3>
+
+
+
+        <input type="hidden"
+               id="rejectOrderId" />
+
+
+
+        <label>
+            Select Reason
+        </label>
+
+
+
+        <select id="rejectReason">
+
+
+            <option value="">
+                Select reason
+            </option>
+
+
+            <option value="Out of delivery area">
+                Out of delivery area
+            </option>
+
+
+            <option value="Customer request">
+                Customer request
+            </option>
+
+
+            <option value="Unable to contact customer">
+                Unable to contact customer
+            </option>
+
+
+            <option value="Order information issue">
+                Order information issue
+            </option>
+
+
+            <option value="Other reason">
+                Other reason
+            </option>
+
+
+        </select>
+
+        <p id="rejectReasonError"
+           class="reject-reason-error">
+
+        </p>
+
+        <textarea id="rejectNote"
+                  placeholder="Additional note (optional)">
+        </textarea>
+
+
+
+
+        <div class="order-modal-buttons">
+
+
+            <button type="button"
+                    class="order-cancel-reject">
+
+                Cancel
+
+            </button>
+
+
+            <button type="button"
+                    class="order-submit-reject">
+
+                Reject Order
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <script src="~/js/listing-search.js" asp-append-version="true"></script>
+
+}

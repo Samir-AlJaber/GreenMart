@@ -258,20 +258,28 @@
             else
             {
 
-                <a asp-controller="Cart"
-                   asp-action="Add"
-                   asp-route-id="@Model.ProductId"
-                   class="product-cart-button">
+                @if (Model.StockQuantity > 0)
+                {
+                    <a asp-controller="Cart"
+                       asp-action="Add"
+                       asp-route-id="@Model.ProductId"
+                       class="product-cart-button">
 
+                        Add To Cart
 
-                    Add To Cart
+                    </a>
+                }
+                else
+                {
+                    <button type="button"
+                            class="product-cart-button product-out-of-stock"
+                            disabled>
 
+                        Out Of Stock
 
-                </a>
-
+                    </button>
+                }
             }
-
-
         }
         else
         {
