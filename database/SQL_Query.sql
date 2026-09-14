@@ -316,4 +316,9 @@ VALUES
 
 ('Others', 'Other products');
 
+
+ALTER TABLE Orders
+ADD 
+    RejectionReason VARCHAR(100) NULL,
+    RejectionNote VARCHAR(500) NULL;
 GO
