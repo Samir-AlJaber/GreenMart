@@ -1,0 +1,501 @@
+@model GreenMart.Models.Cart
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+
+
+<section class="checkout-page">
+
+
+    <div class="checkout-header">
+
+        <h1>
+            Checkout
+        </h1>
+
+        <p>
+            Complete your order details before placing your order.
+        </p>
+
+    </div>
+
+
+
+    <div class="checkout-container">
+
+
+        <div class="checkout-details">
+
+
+            <h2>
+                Delivery Information
+            </h2>
+
+
+            <div class="checkout-field">
+
+                <label>
+                    Full Name
+                </label>
+
+                <input type="text"
+                       value="@Model.User.FullName"
+                       readonly />
+
+            </div>
+
+
+
+            <div class="checkout-field">
+
+                <label>
+                    Phone Number
+                </label>
+
+                <input type="text"
+                   name="PhoneNumber"
+                   id="phoneNumber"
+                   value="@Model.User.PhoneNumber"
+                   maxlength="11"
+                   inputmode="numeric"
+                   autocomplete="tel"
+                   required />
+
+                   <p id="phoneError"
+                       class="checkout-error">
+                    </p>
+
+            </div>
+
+
+
+            <div class="checkout-field">
+
+                <label>
+                    Shipping Address
+                </label>
+
+                <textarea name="ShippingAddress"
+                          rows="4"
+                          required>@Model.User.Address</textarea>
+
+                         <p id="addressError"
+                           class="checkout-error">
+                        </p>
+
+            </div>
+
+
+
+        </div>
+
+
+
+
+        <div class="checkout-summary">
+
+
+            <h2>
+                Order Summary
+            </h2>
+
+
+
+            @foreach (var item in Model.CartItems)
+            {
+
+
+                <div class="checkout-product">
+
+
+                    <span>
+                        @item.Product.ProductName
+                        ×
+                        @item.Quantity
+                    </span>
+
+
+                    <strong>
+                        ৳@(item.Product.Price * item.Quantity)
+                    </strong>
+
+
+                </div>
+
+
+            }
+
+
+
+            <div class="checkout-total">
+
+
+                <span>
+                    Total
+                </span>
+
+
+                <strong>
+
+                    ৳@Model.CartItems.Sum(
+                        x =>
+                        x.Product.Price *
+                        x.Quantity
+                    )
+
+                </strong>
+
+
+            </div>
+
+
+
+            <button type="button"
+                    id="placeOrderBtn"
+                    class="place-order-btn">
+
+                Place Order
+
+            </button>
+
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+<div class="order-place-overlay"
+     id="placeOrderOverlay"
+     style="display:none;">
+
+
+    <div class="order-place-box">
+
+
+        <h3>
+            Confirm Order
+        </h3>
+
+
+        <p>
+            Are you sure you want to place this order?
+        </p>
+
+
+
+        <div class="order-place-buttons">
+
+
+            <button type="button"
+                    id="cancelPlaceOrder">
+
+                Cancel
+
+            </button>
+
+
+
+            <button type="button"
+                    id="confirmPlaceOrder">
+
+                Confirm Order
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<div class="order-success-message"
+     id="orderSuccessMessage"
+     style="display:none;">
+
+    Order placed successfully.
+
+</div>
+
+<script>
+
+            document
+            .getElementById("phoneNumber")
+            .addEventListener(
+                "input",
+                function ()
+                {
+
+                    this.value =
+                        this.value.replace(
+                            /[^0-9]/g,
+                            ""
+                        );
+
+                }
+            );
+
+</script>
+
+<script>
+
+                document
+                .getElementById("placeOrderBtn")
+                .addEventListener(
+                    "click",
+                    function ()
+                    {
+
+
+                        let phone =
+                            document
+                            .getElementById("phoneNumber")
+                            .value;
+
+
+                        let address =
+                            document
+                            .querySelector(
+                                "textarea[name='ShippingAddress']"
+                            )
+                            .value;
+
+
+
+                        document
+                            .getElementById("phoneError")
+                            .innerHTML = "";
+
+                            document
+                            .getElementById("phoneError")
+                            .classList.remove("show");
+
+
+                            document
+                            .getElementById("addressError")
+                            .innerHTML = "";
+
+                            document
+                            .getElementById("addressError")
+                            .classList.remove("show");
+
+
+                        fetch(
+                              "/Checkout/ValidateOrder",
+                            {
+
+                                method: "POST",
+
+                                headers:
+                                {
+                                    "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                                },
+
+
+                                body:
+                                `PhoneNumber=${encodeURIComponent(phone)}&ShippingAddress=${encodeURIComponent(address)}`
+
+                            }
+                        )
+
+                        .then(
+                            response =>
+                            response.json()
+                        )
+
+
+                        .then(
+                            data =>
+                            {
+
+
+                                if(data.success)
+                                {
+
+                                    document
+                                    .getElementById("placeOrderOverlay")
+                                    .style.display = "flex";
+
+
+                                }
+                                else
+                                {
+
+
+                                    if(data.phoneError)
+{
+
+                                        document
+                                        .getElementById("phoneError")
+                                        .innerHTML =
+                                        data.phoneError;
+
+
+                                        document
+                                        .getElementById("phoneError")
+                                        .classList.add("show");
+
+                                    }
+
+
+
+                                    if(data.addressError)
+                                    {
+
+                                        document
+                                        .getElementById("addressError")
+                                        .innerHTML =
+                                        data.addressError;
+
+
+                                        document
+                                        .getElementById("addressError")
+                                        .classList.add("show");
+
+                                    }
+
+
+                                }
+
+
+                            }
+                        );
+
+
+                    }
+
+                );
+
+</script>
+
+<script>
+                                document
+                                    .getElementById("cancelPlaceOrder")
+                                    .addEventListener(
+                                        "click",
+                                        function()
+                                        {
+
+                                            document
+                                            .getElementById("placeOrderOverlay")
+                                            .style.display = "none";
+
+                                        }
+                                    );
+
+
+
+                                    document
+.getElementById("confirmPlaceOrder")
+.addEventListener(
+    "click",
+    function()
+    {
+
+        let phone =
+            document
+            .getElementById("phoneNumber")
+            .value;
+
+
+        let address =
+            document
+            .querySelector(
+                "textarea[name='ShippingAddress']"
+            )
+            .value;
+
+
+
+        fetch(
+            "/Checkout/PlaceOrder",
+            {
+
+                method: "POST",
+
+                headers:
+                {
+                    "Content-Type":
+                    "application/x-www-form-urlencoded"
+                },
+
+
+                body:
+                `PhoneNumber=${encodeURIComponent(phone)}&ShippingAddress=${encodeURIComponent(address)}`
+
+            }
+        )
+
+        .then(
+            response =>
+            response.json()
+        )
+
+
+        .then(
+            data =>
+            {
+
+                if(data.success)
+                {
+
+                    document
+                    .getElementById("placeOrderOverlay")
+                    .style.display = "none";
+
+
+
+                    document
+                    .getElementById("orderSuccessMessage")
+                    .style.display = "block";
+
+                    fetch("/Cart/CartCount")
+                        .then(response => response.json())
+                        .then(data =>
+                    {
+
+                        let badge =
+                            document.getElementById("cartCountBadge");
+
+
+                        if(badge)
+                        {
+                            badge.innerHTML = data.count;
+                        }
+
+                    });
+
+                    setTimeout(
+                        function()
+                        {
+
+                            window.location.href =
+                            "/Order/MyOrders";
+
+                        },
+                        3000
+                    );
+
+                }
+
+
+            }
+
+        );
+
+
+    }
+);
+
+</script>
