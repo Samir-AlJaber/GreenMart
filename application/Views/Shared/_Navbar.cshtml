@@ -1,4 +1,4 @@
-﻿<nav class="green-navbar">
+<nav class="green-navbar">
 
     <div class="navbar-container">
 
@@ -21,7 +21,7 @@
         </button>
 
 
-
+        
 
 
         <div class="navbar-menu"
@@ -78,7 +78,19 @@
                     </a>
 
 
+                    <a asp-controller="Order"
+                       asp-action="MyOrders">
 
+                        My Orders
+
+                    </a>
+
+                    <a asp-controller="Order"
+                       asp-action="OwnerOrders">
+
+                        Order History
+
+                    </a>
 
 
                     <a asp-controller="Cart"
@@ -87,7 +99,8 @@
 
                         🛒 Cart
 
-                        <span class="cart-badge">
+                        <span class="cart-badge"
+                              id="cartCountBadge">
                             @await Component.InvokeAsync("CartCount")
                         </span>
 
@@ -100,7 +113,8 @@
 
 
 
-                <a href="#">
+                <a asp-controller="Home"
+                   asp-action="About">
 
                     About
 
@@ -110,7 +124,8 @@
 
 
 
-                <a href="#">
+                <a asp-controller="Home"
+                   asp-action="Contact">
 
                     Contact
 

@@ -1,4 +1,4 @@
-﻿<footer class="green-footer">
+<footer class="green-footer">
 
     <div class="footer-decoration footer-circle-one"></div>
 
@@ -130,7 +130,8 @@
 
 
 
-            <a href="#">
+            <a asp-controller="Home"
+               asp-action="About">
 
                 About
 
@@ -140,7 +141,8 @@
 
 
 
-            <a href="#">
+            <a asp-controller="Home"
+               asp-action="Contact">
 
                 Contact
 
@@ -198,9 +200,18 @@
 
 
 
-                <a href="#">
+                <a asp-controller="Order"
+                   asp-action="MyOrders">
 
-                    Orders
+                    My Orders
+
+                </a>
+
+
+                <a asp-controller="Order"
+                   asp-action="OwnerOrders">
+
+                    Order History
 
                 </a>
 

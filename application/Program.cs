@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using GreenMart.Data;
+using GreenMart.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +25,9 @@ builder.Services.AddAuthentication("GreenMartCookie")
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped<IProductSearchService, ProductSearchService>();
 
+builder.Services.AddScoped<ProductSearchService>();
 
 builder.Services.AddControllersWithViews();
 
