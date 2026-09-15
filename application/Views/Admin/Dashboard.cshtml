@@ -1,0 +1,86 @@
+@model IReadOnlyList<GreenMart.Models.DeliveryManApplication>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var pendingCount = Model.Count(x => x.Status == "Pending");
+}
+
+<section class="role-dashboard">
+    <div class="role-dashboard-shell">
+        <header class="role-dashboard-header">
+            <div>
+                <span class="role-eyebrow">GreenMart administration</span>
+                <h1>Delivery partner approvals</h1>
+                <p>Review each applicant's information before allowing access to delivery orders.</p>
+            </div>
+
+            <div class="role-summary-card">
+                <strong>@pendingCount</strong>
+                <span>waiting for review</span>
+            </div>
+        </header>
+
+        @if (TempData["AdminMessage"] != null)
+        {
+            <div class="role-notice">@TempData["AdminMessage"]</div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="role-empty-state">
+                <h2>No delivery requests yet</h2>
+                <p>New delivery partner applications will appear here automatically.</p>
+            </div>
+        }
+        else
+        {
+            <div class="application-list">
+                @foreach (var application in Model)
+                {
+                    <article class="application-card">
+                        <div class="application-card-top">
+                            <div class="application-avatar">
+                                @application.User.FullName.Substring(0, 1).ToUpper()
+                            </div>
+                            <div>
+                                <h2>@application.User.FullName</h2>
+                                <p>@application.User.Email</p>
+                            </div>
+                            <span class="application-status application-status-@application.Status.ToLowerInvariant()">
+                                @application.Status
+                            </span>
+                        </div>
+
+                        <dl class="application-details">
+                            <div><dt>Phone</dt><dd>@application.User.PhoneNumber</dd></div>
+                            <div><dt>Address</dt><dd>@(application.User.Address ?? "Not provided")</dd></div>
+                            <div><dt>NID number</dt><dd>@application.NidNumber</dd></div>
+                            <div><dt>Vehicle</dt><dd>@application.VehicleType</dd></div>
+                            <div><dt>Vehicle number</dt><dd>@application.VehicleNumber</dd></div>
+                            <div><dt>Applied</dt><dd>@application.SubmittedAt.ToString("dd MMM yyyy, h:mm tt")</dd></div>
+                        </dl>
+
+                        @if (application.Status == "Pending")
+                        {
+                            <form asp-controller="Admin"
+                                  asp-action="ApproveDeliveryMan"
+                                  method="post"
+                                  class="application-actions">
+                                <input type="hidden"
+                                       name="applicationId"
+                                       value="@application.DeliveryManApplicationId" />
+                                <button type="submit">Approve delivery partner</button>
+                            </form>
+                        }
+                        else if (application.ReviewedAt.HasValue)
+                        {
+                            <p class="application-reviewed">
+                                Approved @application.ReviewedAt.Value.ToString("dd MMM yyyy, h:mm tt")
+                            </p>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>
