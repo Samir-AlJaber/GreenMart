@@ -26,7 +26,7 @@ namespace GreenMart.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            return View();
+            return View(new RegisterViewModel());
         }
 
 
@@ -34,36 +34,70 @@ namespace GreenMart.Controllers
 
 
         [HttpPost]
-        public IActionResult Register(User user)
+        [ValidateAntiForgeryToken]
+        public IActionResult Register(RegisterViewModel model)
         {
 
-            ValidateUser(user);
+            ValidateUser(model);
+
+            var isDeliveryApplication =
+                string.Equals(
+                    model.AccountType,
+                    "DeliveryMan",
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+            if (isDeliveryApplication)
+            {
+                if (string.IsNullOrWhiteSpace(model.NidNumber))
+                    ModelState.AddModelError(nameof(model.NidNumber), "NID number is required");
+
+                if (string.IsNullOrWhiteSpace(model.VehicleType))
+                    ModelState.AddModelError(nameof(model.VehicleType), "Vehicle type is required");
+
+                if (string.IsNullOrWhiteSpace(model.VehicleNumber))
+                    ModelState.AddModelError(nameof(model.VehicleNumber), "Vehicle number is required");
+            }
 
 
 
             if (ModelState.IsValid)
             {
 
-                user.PasswordHash =
-                    BCrypt.Net.BCrypt.HashPassword(
-                        user.PasswordHash
-                    );
-
-
-
-                user.Role = "User";
-
-
-
-                user.IsActive = true;
-
-
+                var user = new User
+                {
+                    FullName = model.FullName.Trim(),
+                    Email = model.Email.Trim(),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                    PhoneNumber = model.PhoneNumber.Trim(),
+                    Address = model.Address?.Trim(),
+                    Role = isDeliveryApplication ? "DeliveryManPending" : "User",
+                    IsActive = true,
+                    CreatedAt = DateTime.Now
+                };
 
                 _context.Users.Add(user);
 
 
+                if (isDeliveryApplication)
+                {
+                    _context.DeliveryManApplications.Add(
+                        new DeliveryManApplication
+                        {
+                            User = user,
+                            NidNumber = model.NidNumber!.Trim(),
+                            VehicleType = model.VehicleType!.Trim(),
+                            VehicleNumber = model.VehicleNumber!.Trim(),
+                            Status = "Pending",
+                            SubmittedAt = DateTime.Now
+                        }
+                    );
+                }
+
 
                 _context.SaveChanges();
+
+                ViewBag.IsDeliveryApplication = isDeliveryApplication;
 
 
 
@@ -73,7 +107,7 @@ namespace GreenMart.Controllers
 
 
 
-            return View(user);
+            return View(model);
 
         }
 
@@ -165,10 +199,33 @@ namespace GreenMart.Controllers
             }
 
 
+            if (user.Role == "DeliveryManPending")
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Your delivery partner request is waiting for admin approval. We will email you after approval."
+                );
+
+                return View(model);
+            }
+
+
 
 
 
             await SignInUser(user);
+
+
+            if (user.Role == "Admin")
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+
+
+            if (user.Role == "DeliveryMan")
+            {
+                return RedirectToAction("Dashboard", "Delivery");
+            }
 
 
 
@@ -696,7 +753,7 @@ namespace GreenMart.Controllers
 
 
 
-        private void ValidateUser(User user)
+        private void ValidateUser(RegisterViewModel user)
         {
 
 
@@ -742,18 +799,18 @@ namespace GreenMart.Controllers
 
 
 
-            if (!string.IsNullOrEmpty(user.PasswordHash))
+            if (!string.IsNullOrEmpty(user.Password))
             {
 
 
                 if (!Regex.IsMatch(
-                    user.PasswordHash,
+                    user.Password,
                     @"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$"
                 ))
                 {
 
                     ModelState.AddModelError(
-                        "PasswordHash",
+                        "Password",
                         "Password must contain uppercase, lowercase, digit and minimum 8 characters"
                     );
 

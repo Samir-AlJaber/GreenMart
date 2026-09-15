@@ -45,5 +45,17 @@ namespace GreenMart.Data
 
         public DbSet<Review> Reviews { get; set; }
 
+
+
+        public DbSet<DeliveryManApplication> DeliveryManApplications { get; set; }
+
+
+
+        public DbSet<DeliveryAssignment> DeliveryAssignments { get; set; }
+
+
+
+        public DbSet<DeliveryRating> DeliveryRatings { get; set; }
+
     }
 }

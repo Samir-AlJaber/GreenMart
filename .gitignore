@@ -5,6 +5,7 @@
 application/bin/
 application/obj/
 application/appsettings.json
+application/appsettings.Maps.json
 
 # Visual Studio user-specific files
 *.user
