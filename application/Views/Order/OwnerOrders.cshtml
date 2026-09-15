@@ -22,6 +22,11 @@
 
     </div>
 
+    @if (TempData["OrderMessage"] != null)
+    {
+        <div class="role-notice">@TempData["OrderMessage"]</div>
+    }
+
 
 
     <div class="product-search-area listing-search history-search"
@@ -519,6 +524,8 @@
     </div>
 
 </div>
+
+<partial name="_LocationPicker" />
 
 
 @section Scripts {

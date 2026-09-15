@@ -1,4 +1,23 @@
 @model IEnumerable<GreenMart.DTOs.OrderProductSearchResultDto>
+@using GreenMart.Models
+
+@{
+    var availableDeliveryMen = ViewBag.AvailableDeliveryMen as List<AvailableDeliveryManViewModel>
+        ?? new List<AvailableDeliveryManViewModel>();
+    var deliveryAssignments = ViewBag.OwnerDeliveryAssignments as Dictionary<int, DeliveryAssignment>
+        ?? new Dictionary<int, DeliveryAssignment>();
+    var defaultPickupAddress = ViewBag.SellerPickupAddress as string ?? string.Empty;
+    var defaultPickupPhone = ViewBag.SellerPickupPhone as string ?? string.Empty;
+
+    string DeliveryStatus(string status) => status switch
+    {
+        "GoingToPickup" => "Going to pickup",
+        "ArrivedAtPickup" => "Arrived at seller",
+        "PickedUp" => "Product picked up",
+        "OnTheWay" => "On the way to customer",
+        _ => status
+    };
+}
 
 
 @if (Model == null || !Model.Any())
@@ -46,6 +65,10 @@ else
 
         @foreach(var product in Model)
         {
+
+            var currentAssignment = deliveryAssignments.ContainsKey(product.OrderId)
+                ? deliveryAssignments[product.OrderId]
+                : null;
 
 
             <div class="product-card-custom order-card-custom">
@@ -268,6 +291,90 @@ else
 
                     </div>
 
+                }
+
+                @if (product.OrderStatus == "Confirmed" || currentAssignment != null)
+                {
+                    <div class="delivery-assignment-panel">
+                        <span class="delivery-panel-label">Delivery partner</span>
+
+                        @if (currentAssignment != null)
+                        {
+                            <div class="assigned-delivery-person">
+                                <strong>@currentAssignment.DeliveryMan.FullName</strong>
+                                <span>@DeliveryStatus(currentAssignment.Status)</span>
+                            </div>
+                            <div class="seller-pickup-summary">
+                                <span>Pickup from</span>
+                                <strong>@currentAssignment.PickupAddress</strong>
+                                <small>@currentAssignment.PickupPhone</small>
+                            </div>
+                            <a asp-controller="Delivery"
+                               asp-action="Track"
+                               asp-route-assignmentId="@currentAssignment.DeliveryAssignmentId"
+                               class="track-delivery-link">
+                                Track delivery partner
+                            </a>
+                        }
+
+                        @if (currentAssignment == null || currentAssignment.Status == "Assigned")
+                        {
+                            @if (availableDeliveryMen.Any())
+                            {
+                                <form asp-controller="Delivery" asp-action="Assign" method="post" class="delivery-assign-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="orderId" value="@product.OrderId" />
+                                    <select name="deliveryManId" required aria-label="Choose an available delivery partner">
+                                        <option value="">Choose available partner</option>
+                                        @foreach (var deliveryMan in availableDeliveryMen)
+                                        {
+                                            <option value="@deliveryMan.UserId">
+                                                @deliveryMan.FullName · @deliveryMan.VehicleType · @(deliveryMan.RatingCount == 0 ? "New" : $"★ {deliveryMan.AverageRating:F1}")
+                                            </option>
+                                        }
+                                    </select>
+
+                                    <div class="pickup-form-fields">
+                                        <div class="pickup-address-field">
+                                            <label>
+                                                Pickup address
+                                                <textarea name="pickupAddress"
+                                                          id="pickupAddress-@product.OrderId"
+                                                          maxlength="300" required
+                                                          placeholder="Where should the delivery partner collect the product?">@(currentAssignment?.PickupAddress ?? defaultPickupAddress)</textarea>
+                                            </label>
+                                            <input type="hidden" name="pickupLatitude" id="pickupLatitude-@product.OrderId" value="@currentAssignment?.PickupLatitude" />
+                                            <input type="hidden" name="pickupLongitude" id="pickupLongitude-@product.OrderId" value="@currentAssignment?.PickupLongitude" />
+                                            <button type="button"
+                                                    class="location-picker-trigger js-location-picker"
+                                                    data-address-target="#pickupAddress-@product.OrderId"
+                                                    data-latitude-target="#pickupLatitude-@product.OrderId"
+                                                    data-longitude-target="#pickupLongitude-@product.OrderId"
+                                                    data-picker-title="Choose seller pickup location">
+                                                Set exact location on map
+                                            </button>
+                                        </div>
+                                        <label>
+                                            Pickup phone
+                                            <input type="tel" name="pickupPhone" maxlength="20" required
+                                                   value="@(currentAssignment?.PickupPhone ?? defaultPickupPhone)"
+                                                   placeholder="Seller contact number" />
+                                        </label>
+                                        <label>
+                                            Pickup instructions <small>(optional)</small>
+                                            <textarea name="pickupInstructions" maxlength="500"
+                                                      placeholder="Example: Call at the gate or collect from apartment 4B">@currentAssignment?.PickupInstructions</textarea>
+                                        </label>
+                                    </div>
+                                    <button type="submit">@(currentAssignment == null ? "Assign" : "Reassign")</button>
+                                </form>
+                            }
+                            else if (currentAssignment == null)
+                            {
+                                <p class="delivery-help-text">No delivery partners are available right now.</p>
+                            }
+                        }
+                    </div>
                 }
 
 
