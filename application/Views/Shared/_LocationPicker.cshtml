@@ -1,0 +1,41 @@
+@inject IConfiguration Configuration
+
+<div class="location-picker-modal"
+     id="locationPickerModal"
+     data-api-key="@Configuration["GoogleMaps:ApiKey"]"
+     aria-hidden="true">
+    <div class="location-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="locationPickerTitle">
+        <header class="location-picker-header">
+            <div>
+                <span>Pin the exact spot</span>
+                <h2 id="locationPickerTitle">Choose location</h2>
+            </div>
+            <button type="button" class="location-picker-close" aria-label="Close location picker">&times;</button>
+        </header>
+
+        <div class="location-picker-search-row">
+            <input type="search" id="locationPickerSearch" placeholder="Search road, area or landmark" autocomplete="street-address" />
+            <button type="button" id="locationPickerSearchButton">Search</button>
+            <button type="button" id="locationPickerCurrentButton" class="location-picker-current">Use my location</button>
+        </div>
+
+        <div class="location-picker-map-wrap">
+            <div id="locationPickerMap" class="location-picker-map" aria-label="Map for choosing an exact address"></div>
+            <div class="location-picker-map-tip">Tap the map or drag the pin to choose the exact spot</div>
+            <div class="location-picker-loading" id="locationPickerLoading">Loading map...</div>
+        </div>
+
+        <div class="location-picker-result">
+            <span>Selected address</span>
+            <strong id="locationPickerAddress">Search for an address or tap anywhere on the map.</strong>
+            <small id="locationPickerHint">You can drag the pin to adjust the exact entrance.</small>
+        </div>
+
+        <footer class="location-picker-actions">
+            <button type="button" class="location-picker-cancel">Cancel</button>
+            <button type="button" id="locationPickerConfirm" disabled>Confirm this location</button>
+        </footer>
+    </div>
+</div>
+
+<script src="~/js/location-picker.js" asp-append-version="true"></script>

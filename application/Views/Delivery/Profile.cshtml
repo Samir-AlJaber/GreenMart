@@ -1,0 +1,85 @@
+@model GreenMart.Models.DeliveryProfileViewModel
+
+@{
+    ViewData["Title"] = "Delivery Profile";
+}
+
+<section class="role-dashboard delivery-profile-page">
+    <div class="role-dashboard-shell">
+        <header class="role-dashboard-header">
+            <div>
+                <span class="role-eyebrow">Delivery partner profile</span>
+                <h1>@Model.Application.User.FullName</h1>
+                <p>Manage when sellers can assign you and review the feedback from completed deliveries.</p>
+            </div>
+            <div class="role-summary-card">
+                <strong>@(Model.RatingCount == 0 ? "New" : $"{Model.AverageRating:F1} ★")</strong>
+                <span>@Model.RatingCount customer rating@(Model.RatingCount == 1 ? "" : "s")</span>
+            </div>
+        </header>
+
+        @if (TempData["DeliveryMessage"] != null)
+        {
+            <div class="role-notice">@TempData["DeliveryMessage"]</div>
+        }
+
+        <div class="delivery-profile-card">
+            <div class="delivery-profile-identity">
+                <div class="delivery-profile-avatar">@Model.Application.User.FullName.Substring(0, 1).ToUpper()</div>
+                <div>
+                    <h2>@Model.Application.User.FullName</h2>
+                    <p>@Model.Application.User.Email</p>
+                </div>
+                <span class="availability-badge @(Model.Application.IsAvailable ? "is-available" : "is-offline")">
+                    @(Model.Application.IsAvailable ? "Available" : "Busy / offline")
+                </span>
+            </div>
+
+            <div class="delivery-profile-strip">
+                <div><span>Phone</span><strong>@Model.Application.User.PhoneNumber</strong></div>
+                <div><span>Vehicle</span><strong>@Model.Application.VehicleType</strong></div>
+                <div><span>Vehicle number</span><strong>@Model.Application.VehicleNumber</strong></div>
+            </div>
+
+            <form asp-action="SetAvailability" method="post" class="availability-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="isAvailable" value="@(!Model.Application.IsAvailable ? "true" : "false")" />
+                <div>
+                    <strong>@(Model.Application.IsAvailable ? "Ready for an assignment" : "Not accepting assignments")</strong>
+                    <p>Sellers only see your name while you are available. An active delivery automatically makes you busy.</p>
+                </div>
+                <button type="submit" class="@(Model.Application.IsAvailable ? "availability-off" : "availability-on")">
+                    @(Model.Application.IsAvailable ? "Go offline" : "Become available")
+                </button>
+            </form>
+        </div>
+
+        <section class="delivery-reviews-section">
+            <div class="section-heading-small">
+                <h2>Customer feedback</h2>
+                <p>Ratings appear after customers receive their orders.</p>
+            </div>
+
+            @if (!Model.RecentRatings.Any())
+            {
+                <div class="role-empty-state compact-empty-state">
+                    <h2>No ratings yet</h2>
+                    <p>Your customer ratings will appear here after completed deliveries.</p>
+                </div>
+            }
+            else
+            {
+                <div class="delivery-review-list">
+                    @foreach (var rating in Model.RecentRatings)
+                    {
+                        <article class="delivery-review-card">
+                            <div class="rating-stars">@(new string('★', rating.RatingValue))@(new string('☆', 5 - rating.RatingValue))</div>
+                            <strong>@rating.RatingLabel</strong>
+                            <span>Rated by @rating.Customer.FullName · @rating.CreatedAt.ToString("dd MMM yyyy")</span>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</section>

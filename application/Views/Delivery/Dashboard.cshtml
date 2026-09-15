@@ -1,0 +1,245 @@
+@model GreenMart.Models.DeliveryDashboardViewModel
+
+@{
+    ViewData["Title"] = "Delivery Dashboard";
+
+    string DeliveryStatus(string status) => status switch
+    {
+        "GoingToPickup" => "Going to pickup",
+        "ArrivedAtPickup" => "Arrived at seller",
+        "PickedUp" => "Product picked up",
+        "OnTheWay" => "On the way to customer",
+        _ => status
+    };
+}
+
+<section class="role-dashboard">
+    <div class="role-dashboard-shell">
+        <header class="role-dashboard-header">
+            <div>
+                <span class="role-eyebrow">Approved delivery partner</span>
+                <h1>Welcome, @Model.Application.User.FullName</h1>
+                <p>Your assigned GreenMart deliveries and customer information will appear here.</p>
+            </div>
+
+            <div class="role-summary-card">
+                <strong>@Model.Assignments.Count</strong>
+                <span>assigned orders</span>
+            </div>
+        </header>
+
+        @if (TempData["DeliveryMessage"] != null)
+        {
+            <div class="role-notice">@TempData["DeliveryMessage"]</div>
+        }
+
+        <div class="delivery-profile-strip">
+            <div><span>Vehicle</span><strong>@Model.Application.VehicleType</strong></div>
+            <div><span>Vehicle number</span><strong>@Model.Application.VehicleNumber</strong></div>
+            <div><span>Account</span><strong>Approved</strong></div>
+            <div><span>Availability</span><strong>@(Model.Application.IsAvailable ? "Available" : "Busy / offline")</strong></div>
+        </div>
+
+        @if (!Model.Assignments.Any())
+        {
+            <div class="role-empty-state">
+                <h2>No orders assigned yet</h2>
+                <p>When an order is assigned to you, its pickup and delivery information will show here.</p>
+            </div>
+        }
+        else
+        {
+            <div class="delivery-order-list">
+                @foreach (var assignment in Model.Assignments)
+                {
+                    var pickupMapQuery = assignment.PickupLatitude.HasValue && assignment.PickupLongitude.HasValue
+                        ? FormattableString.Invariant($"{assignment.PickupLatitude},{assignment.PickupLongitude}")
+                        : assignment.PickupAddress;
+                    var deliveryMapQuery = assignment.Order.ShippingLatitude.HasValue && assignment.Order.ShippingLongitude.HasValue
+                        ? FormattableString.Invariant($"{assignment.Order.ShippingLatitude},{assignment.Order.ShippingLongitude}")
+                        : assignment.Order.ShippingAddress ?? string.Empty;
+                    var pickupMapUrl = $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(pickupMapQuery)}";
+                    var deliveryMapUrl = $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(deliveryMapQuery)}";
+
+                    <article class="delivery-order-card">
+                        <div class="delivery-order-heading">
+                            <div>
+                                <span>Order</span>
+                                <h2>#@assignment.OrderId</h2>
+                            </div>
+                            <span class="application-status application-status-approved">@DeliveryStatus(assignment.Status)</span>
+                        </div>
+
+                        <div class="delivery-route-grid">
+                            <section class="delivery-route-stop pickup-stop">
+                                <span class="route-step">1 · Pickup from seller</span>
+                                <h3>@assignment.Seller.FullName</h3>
+                                <p>@assignment.PickupAddress</p>
+                                <a href="tel:@assignment.PickupPhone">Call @assignment.PickupPhone</a>
+                                <a href="@pickupMapUrl" target="_blank" rel="noopener">Open pickup address in Maps</a>
+                                @if (!string.IsNullOrWhiteSpace(assignment.PickupInstructions))
+                                {
+                                    <div class="pickup-instructions">
+                                        <span>Pickup instructions</span>
+                                        <strong>@assignment.PickupInstructions</strong>
+                                    </div>
+                                }
+                            </section>
+
+                            <section class="delivery-route-stop delivery-stop">
+                                <span class="route-step">2 · Deliver to customer</span>
+                                <h3>@assignment.Order.User.FullName</h3>
+                                <p>@assignment.Order.ShippingAddress</p>
+                                <a href="tel:@assignment.Order.User.PhoneNumber">Call @assignment.Order.User.PhoneNumber</a>
+                                <a href="@deliveryMapUrl" target="_blank" rel="noopener">Open delivery address in Maps</a>
+                            </section>
+                        </div>
+
+                        <div class="delivery-products-box">
+                            <span>Products to collect</span>
+                            <strong>@string.Join(", ", assignment.Order.OrderItems?.Where(x => x.Product.UserId == assignment.SellerId).Select(x => x.Product.ProductName) ?? Enumerable.Empty<string>())</strong>
+                        </div>
+
+                        @if (assignment.Status != "Delivered")
+                        {
+                            <div class="location-sharing-control" data-assignment-id="@assignment.DeliveryAssignmentId">
+                                <form class="location-sharing-form">
+                                    @Html.AntiForgeryToken()
+                                    <div>
+                                        <strong>Live location sharing</strong>
+                                        <span class="location-sharing-message">
+                                            @(assignment.IsLocationSharing
+                                                ? "Tap Resume sharing so sellers and customers receive fresh updates."
+                                                : "Share your phone location while completing this delivery.")
+                                        </span>
+                                    </div>
+                                    <div class="location-sharing-actions">
+                                        <button type="button" class="start-location-sharing">
+                                            @(assignment.IsLocationSharing ? "Resume sharing" : "Start sharing")
+                                        </button>
+                                        <button type="button" class="stop-location-sharing" hidden>Stop sharing</button>
+                                    </div>
+                                </form>
+                            </div>
+                        }
+
+                        @if (assignment.Status != "Delivered")
+                        {
+                            var nextStatus = assignment.Status switch
+                            {
+                                "Assigned" => "GoingToPickup",
+                                "GoingToPickup" => "ArrivedAtPickup",
+                                "ArrivedAtPickup" => "PickedUp",
+                                "PickedUp" => "OnTheWay",
+                                _ => "Delivered"
+                            };
+                            var buttonText = nextStatus switch
+                            {
+                                "GoingToPickup" => "Start trip to seller",
+                                "ArrivedAtPickup" => "I arrived at the seller",
+                                "PickedUp" => "Mark product as picked up",
+                                "OnTheWay" => "Start delivery to customer",
+                                _ => "Mark as delivered"
+                            };
+
+                            <form asp-action="UpdateStatus" method="post" class="delivery-status-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="assignmentId" value="@assignment.DeliveryAssignmentId" />
+                                <input type="hidden" name="status" value="@nextStatus" />
+                                <button type="submit">@buttonText</button>
+                            </form>
+                        }
+                        else if (assignment.Rating != null)
+                        {
+                            <div class="saved-delivery-rating">
+                                <span class="rating-stars">@(new string('★', assignment.Rating.RatingValue))@(new string('☆', 5 - assignment.Rating.RatingValue))</span>
+                                <span>@assignment.Rating.RatingLabel from customer</span>
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll(".location-sharing-control").forEach(control => {
+            const assignmentId = control.dataset.assignmentId;
+            const startButton = control.querySelector(".start-location-sharing");
+            const stopButton = control.querySelector(".stop-location-sharing");
+            const message = control.querySelector(".location-sharing-message");
+            const token = control.querySelector("input[name='__RequestVerificationToken']").value;
+            let updateTimer = null;
+
+            const sendLocation = () => {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const form = new FormData();
+                    form.append("__RequestVerificationToken", token);
+                    form.append("assignmentId", assignmentId);
+                    form.append("latitude", position.coords.latitude.toString());
+                    form.append("longitude", position.coords.longitude.toString());
+
+                    fetch("/Delivery/UpdateLocation", {
+                        method: "POST",
+                        body: form,
+                        credentials: "same-origin"
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error("Location update failed");
+                        return response.json();
+                    })
+                    .then(() => {
+                        message.textContent = "Location is live and updates every 12 seconds.";
+                    })
+                    .catch(() => {
+                        message.textContent = "Location could not be updated. Check your connection.";
+                    });
+                }, error => {
+                    message.textContent = error.code === 1
+                        ? "Location permission was denied. Allow location access in your browser."
+                        : "Your current location could not be found.";
+                    startButton.hidden = false;
+                    stopButton.hidden = true;
+                    if (updateTimer) clearInterval(updateTimer);
+                }, {
+                    enableHighAccuracy: true,
+                    maximumAge: 5000,
+                    timeout: 12000
+                });
+            };
+
+            startButton.addEventListener("click", () => {
+                if (!navigator.geolocation) {
+                    message.textContent = "This browser does not support location sharing.";
+                    return;
+                }
+
+                startButton.hidden = true;
+                stopButton.hidden = false;
+                message.textContent = "Finding your location...";
+                sendLocation();
+                updateTimer = setInterval(sendLocation, 12000);
+            });
+
+            stopButton.addEventListener("click", () => {
+                if (updateTimer) clearInterval(updateTimer);
+                const form = new FormData();
+                form.append("__RequestVerificationToken", token);
+                form.append("assignmentId", assignmentId);
+
+                fetch("/Delivery/StopLocationSharing", {
+                    method: "POST",
+                    body: form,
+                    credentials: "same-origin"
+                }).finally(() => {
+                    startButton.hidden = false;
+                    startButton.textContent = "Resume sharing";
+                    stopButton.hidden = true;
+                    message.textContent = "Location sharing is paused.";
+                });
+            });
+        });
+    </script>
+}

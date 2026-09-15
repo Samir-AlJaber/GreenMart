@@ -1,0 +1,289 @@
+@model GreenMart.Models.DeliveryAssignment
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = $"Track Order #{Model.OrderId}";
+}
+
+<section class="role-dashboard tracking-page">
+    <div class="tracking-shell">
+        <header class="tracking-header">
+            <div>
+                <span class="role-eyebrow">Live delivery tracking</span>
+                <h1>Order #@Model.OrderId</h1>
+                <p>Follow @Model.DeliveryMan.FullName between the seller pickup and your delivery destination.</p>
+            </div>
+            <a asp-controller="Order"
+               asp-action="@(User.FindFirst("UserId")?.Value == Model.SellerId.ToString() ? "OwnerOrders" : "MyOrders")"
+               class="tracking-back-link">Back to orders</a>
+        </header>
+
+        <div class="tracking-status-card">
+            <div class="live-status-indicator" id="liveStatusIndicator"></div>
+            <div>
+                <strong id="trackingStatus">Waiting for location...</strong>
+                <span id="trackingUpdated">The delivery partner has not shared a location yet.</span>
+            </div>
+        </div>
+
+        <div class="tracking-map-card">
+            <div class="tracking-map-placeholder" id="trackingMapPlaceholder">
+                <strong>Location is not available yet</strong>
+                <span>Ask the delivery partner to start location sharing from their dashboard.</span>
+            </div>
+            <div id="trackingMap"
+                 class="tracking-google-map"
+                 role="application"
+                 aria-label="Delivery partner location on Google Maps"
+                 hidden></div>
+            <div class="tracking-map-legend" id="trackingMapLegend" hidden>
+                <span><i class="tracking-legend-pin pickup-pin">P</i> Seller pickup</span>
+                <span><i class="tracking-legend-pin rider-pin">R</i> Delivery partner</span>
+                <span><i class="tracking-legend-pin destination-pin">D</i> Customer</span>
+            </div>
+        </div>
+
+        <div class="tracking-route-summary">
+            <section>
+                <span>Pickup</span>
+                <strong>@Model.Seller.FullName</strong>
+                <p>@Model.PickupAddress</p>
+            </section>
+            <div class="route-direction-line"><span></span></div>
+            <section>
+                <span>Delivery</span>
+                <strong>@Model.Order.User.FullName</strong>
+                <p>@Model.Order.ShippingAddress</p>
+            </section>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (() => {
+            const endpoint = "@Url.Action("GetTrackingLocation", "Delivery", new { assignmentId = Model.DeliveryAssignmentId })";
+            const googleMapsApiKey = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Configuration["GoogleMaps:ApiKey"] ?? ""));
+            const pickupPosition = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.PickupLatitude.HasValue && Model.PickupLongitude.HasValue
+                    ? new { lat = Model.PickupLatitude.Value, lng = Model.PickupLongitude.Value }
+                    : null));
+            const deliveryPosition = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.Order.ShippingLatitude.HasValue && Model.Order.ShippingLongitude.HasValue
+                    ? new { lat = Model.Order.ShippingLatitude.Value, lng = Model.Order.ShippingLongitude.Value }
+                    : null));
+            const pickupMarkerTitle = @Html.Raw(System.Text.Json.JsonSerializer.Serialize($"Seller pickup: {Model.PickupAddress}"));
+            const deliveryMarkerTitle = @Html.Raw(System.Text.Json.JsonSerializer.Serialize($"Customer destination: {Model.Order.ShippingAddress}"));
+            const riderMarkerTitle = @Html.Raw(System.Text.Json.JsonSerializer.Serialize($"{Model.DeliveryMan.FullName} is here"));
+            const map = document.getElementById("trackingMap");
+            const placeholder = document.getElementById("trackingMapPlaceholder");
+            const legend = document.getElementById("trackingMapLegend");
+            const status = document.getElementById("trackingStatus");
+            const updated = document.getElementById("trackingUpdated");
+            const indicator = document.getElementById("liveStatusIndicator");
+            let lastCoordinates = "";
+            let googleMap = null;
+            let deliveryMarker = null;
+            let completedPath = null;
+            let remainingPath = null;
+            let mapsLoader = null;
+            let hasFittedLiveRoute = false;
+
+            const loadGoogleMaps = () => {
+                if (window.google?.maps) return Promise.resolve();
+                if (mapsLoader) return mapsLoader;
+
+                mapsLoader = new Promise((resolve, reject) => {
+                    if (!googleMapsApiKey) {
+                        reject(new Error("Google Maps API key is not configured."));
+                        return;
+                    }
+
+                    const callbackName = `greenMartMapsReady_${Date.now()}`;
+                    const script = document.createElement("script");
+
+                    window[callbackName] = () => {
+                        delete window[callbackName];
+                        resolve();
+                    };
+
+                    script.async = true;
+                    script.defer = true;
+                    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(googleMapsApiKey)}&callback=${callbackName}&v=weekly&loading=async`;
+                    script.onerror = () => {
+                        delete window[callbackName];
+                        reject(new Error("Google Maps could not be loaded."));
+                    };
+                    document.head.appendChild(script);
+                });
+
+                return mapsLoader;
+            };
+
+            const showMapError = () => {
+                map.hidden = true;
+                legend.hidden = true;
+                placeholder.hidden = false;
+                placeholder.querySelector("strong").textContent = "Google Maps could not load";
+                placeholder.querySelector("span").textContent = "Check that the Maps JavaScript API is enabled for the configured key.";
+            };
+
+            const markerIcon = color => ({
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 15,
+                fillColor: color,
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 3
+            });
+
+            const createEndpointMarker = (position, label, title, color) =>
+                new google.maps.Marker({
+                    map: googleMap,
+                    position,
+                    label: { text: label, color: "#ffffff", fontWeight: "800" },
+                    icon: markerIcon(color),
+                    title,
+                    zIndex: 2
+                });
+
+            const fitPositions = positions => {
+                if (positions.length === 1) {
+                    googleMap.setCenter(positions[0]);
+                    googleMap.setZoom(16);
+                    return;
+                }
+
+                const bounds = new google.maps.LatLngBounds();
+                positions.forEach(position => bounds.extend(position));
+                googleMap.fitBounds(bounds, 55);
+            };
+
+            const ensureMap = async fallbackPosition => {
+                await loadGoogleMaps();
+                if (googleMap) return;
+
+                const initialPosition = pickupPosition || deliveryPosition || fallbackPosition;
+                googleMap = new google.maps.Map(map, {
+                    center: initialPosition,
+                    zoom: 16,
+                    fullscreenControl: true,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    gestureHandling: "greedy"
+                });
+
+                const endpointPositions = [];
+                if (pickupPosition) {
+                    createEndpointMarker(pickupPosition, "P", pickupMarkerTitle, "#d97706");
+                    endpointPositions.push(pickupPosition);
+                }
+                if (deliveryPosition) {
+                    createEndpointMarker(deliveryPosition, "D", deliveryMarkerTitle, "#047857");
+                    endpointPositions.push(deliveryPosition);
+                }
+
+                if (endpointPositions.length) fitPositions(endpointPositions);
+                map.hidden = false;
+                legend.hidden = false;
+                placeholder.hidden = true;
+            };
+
+            const updateMap = async (latitude, longitude) => {
+                try {
+                    const position = { lat: Number(latitude), lng: Number(longitude) };
+                    await ensureMap(position);
+
+                    if (!deliveryMarker) {
+                        deliveryMarker = new google.maps.Marker({
+                            map: googleMap,
+                            position,
+                            label: { text: "R", color: "#ffffff", fontWeight: "800" },
+                            icon: markerIcon("#2563eb"),
+                            title: riderMarkerTitle,
+                            zIndex: 5
+                        });
+                    } else {
+                        deliveryMarker.setPosition(position);
+                    }
+
+                    if (pickupPosition) {
+                        if (!completedPath) {
+                            completedPath = new google.maps.Polyline({
+                                map: googleMap,
+                                path: [pickupPosition, position],
+                                strokeColor: "#16a34a",
+                                strokeOpacity: .9,
+                                strokeWeight: 5
+                            });
+                        } else {
+                            completedPath.setPath([pickupPosition, position]);
+                        }
+                    }
+
+                    if (deliveryPosition) {
+                        if (!remainingPath) {
+                            remainingPath = new google.maps.Polyline({
+                                map: googleMap,
+                                path: [position, deliveryPosition],
+                                strokeColor: "#64748b",
+                                strokeOpacity: .65,
+                                strokeWeight: 4
+                            });
+                        } else {
+                            remainingPath.setPath([position, deliveryPosition]);
+                        }
+                    }
+
+                    if (!hasFittedLiveRoute) {
+                        fitPositions([pickupPosition, position, deliveryPosition].filter(Boolean));
+                        hasFittedLiveRoute = true;
+                    } else if (!googleMap.getBounds()?.contains(position)) {
+                        googleMap.panTo(position);
+                    }
+                } catch {
+                    showMapError();
+                }
+            };
+
+            const refreshTracking = () => {
+                fetch(endpoint, { credentials: "same-origin" })
+                    .then(response => {
+                        if (!response.ok) throw new Error("Tracking request failed");
+                        return response.json();
+                    })
+                    .then(data => {
+                        status.textContent = `${data.deliveryMan} · ${data.status}`;
+                        indicator.classList.toggle("is-live", data.isLive);
+
+                        if (data.updatedAt) {
+                            const time = new Date(data.updatedAt);
+                            updated.textContent = data.isLive
+                                ? `Live · updated ${time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
+                                : `Last location update ${time.toLocaleString()}`;
+                        }
+
+                        if (data.hasLocation) {
+                            const coordinates = `${data.latitude},${data.longitude}`;
+                            if (coordinates !== lastCoordinates) {
+                                updateMap(data.latitude, data.longitude);
+                                lastCoordinates = coordinates;
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        status.textContent = "Tracking is temporarily unavailable";
+                        updated.textContent = "Please check your connection and try again.";
+                        indicator.classList.remove("is-live");
+                    });
+            };
+
+            if (pickupPosition || deliveryPosition) {
+                ensureMap(pickupPosition || deliveryPosition).catch(showMapError);
+            }
+
+            refreshTracking();
+            setInterval(refreshTracking, 8000);
+        })();
+    </script>
+}
