@@ -1,0 +1,255 @@
+.location-picker-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: fit-content;
+    margin-top: 9px;
+    padding: 9px 13px;
+    border: 1px solid #9bc9ad;
+    border-radius: 10px;
+    background: #f3fbf6;
+    color: #076348;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.location-picker-trigger::before {
+    width: 8px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    content: "";
+}
+
+.location-picker-trigger:hover {
+    border-color: #43a274;
+    background: #e9f8ef;
+    transform: translateY(-1px);
+}
+
+.pickup-address-field {
+    min-width: 0;
+}
+
+.pickup-address-field label {
+    height: auto;
+}
+
+.location-picker-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(7, 35, 26, .55);
+    backdrop-filter: blur(5px);
+}
+
+.location-picker-modal.is-open {
+    display: flex;
+}
+
+body.location-picker-open {
+    overflow: hidden;
+}
+
+.location-picker-dialog {
+    width: min(820px, 100%);
+    max-height: min(92vh, 780px);
+    overflow: auto;
+    border: 1px solid rgba(17, 117, 79, .18);
+    border-radius: 22px;
+    background: #fbfdfb;
+    box-shadow: 0 28px 80px rgba(4, 40, 28, .24);
+}
+
+.location-picker-header,
+.location-picker-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+}
+
+.location-picker-header span,
+.location-picker-result span {
+    color: #43806a;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.location-picker-header h2 {
+    margin: 3px 0 0;
+    color: #103d2f;
+    font-size: 23px;
+}
+
+.location-picker-close {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: #eaf5ee;
+    color: #174c3b;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.location-picker-search-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 9px;
+    padding: 0 20px 14px;
+}
+
+.location-picker-search-row input {
+    min-width: 0;
+    padding: 11px 13px;
+    border: 1px solid #bdd7c7;
+    border-radius: 11px;
+    outline: 0;
+}
+
+.location-picker-search-row input:focus {
+    border-color: #178258;
+    box-shadow: 0 0 0 3px rgba(23, 130, 88, .12);
+}
+
+.location-picker-search-row button,
+.location-picker-actions button {
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 10px;
+    background: #116646;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.location-picker-search-row .location-picker-current {
+    border: 1px solid #a9cdb8;
+    background: #edf8f1;
+    color: #116646;
+}
+
+.location-picker-search-row button:disabled,
+.location-picker-actions button:disabled {
+    cursor: wait;
+    opacity: .55;
+}
+
+.location-picker-map-wrap {
+    position: relative;
+    height: min(48vh, 430px);
+    min-height: 320px;
+    margin: 0 20px;
+    overflow: hidden;
+    border: 1px solid #c6ddd0;
+    border-radius: 16px;
+    background: #e8f2eb;
+}
+
+.location-picker-map {
+    width: 100%;
+    height: 100%;
+}
+
+.location-picker-map-tip {
+    position: absolute;
+    z-index: 2;
+    top: 11px;
+    left: 50%;
+    width: max-content;
+    max-width: calc(100% - 120px);
+    padding: 7px 11px;
+    border: 1px solid rgba(17, 102, 70, .15);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .94);
+    color: #245a46;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 5px 16px rgba(10, 62, 42, .12);
+    pointer-events: none;
+    transform: translateX(-50%);
+}
+
+.location-picker-loading {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    padding: 9px 13px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .95);
+    color: #1b5743;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 7px 22px rgba(14, 73, 51, .16);
+    transform: translate(-50%, -50%);
+}
+
+.location-picker-loading[hidden] {
+    display: none;
+}
+
+.location-picker-result {
+    display: grid;
+    gap: 4px;
+    margin: 14px 20px 0;
+    padding: 13px 15px;
+    border-radius: 12px;
+    background: #edf7f0;
+}
+
+.location-picker-result strong {
+    color: #173f32;
+    font-size: 14px;
+}
+
+.location-picker-result small {
+    color: #688276;
+}
+
+.location-picker-actions {
+    justify-content: flex-end;
+}
+
+.location-picker-actions .location-picker-cancel {
+    border: 1px solid #bfd2c7;
+    background: #fff;
+    color: #34594c;
+}
+
+@media (max-width: 650px) {
+    .location-picker-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .location-picker-dialog {
+        max-height: 94vh;
+        border-radius: 22px 22px 0 0;
+    }
+
+    .location-picker-search-row {
+        grid-template-columns: 1fr 90px;
+    }
+
+    .location-picker-search-row .location-picker-current {
+        grid-column: 1 / -1;
+    }
+
+    .location-picker-map-wrap {
+        height: 40vh;
+        min-height: 280px;
+    }
+}

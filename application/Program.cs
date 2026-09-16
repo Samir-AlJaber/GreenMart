@@ -4,6 +4,12 @@ using GreenMart.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile(
+    "appsettings.Maps.json",
+    optional: true,
+    reloadOnChange: true
+);
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
@@ -28,6 +34,14 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IProductSearchService, ProductSearchService>();
 
 builder.Services.AddScoped<ProductSearchService>();
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("Email")
+);
+
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
+builder.Services.AddScoped<IOrderReceiptPdfService, OrderReceiptPdfService>();
 
 builder.Services.AddControllersWithViews();
 

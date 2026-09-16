@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GreenMart.Services;
+using GreenMart.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GreenMart.Controllers
 {
@@ -14,14 +16,17 @@ namespace GreenMart.Controllers
 
         private readonly ApplicationDbContext _context;
         private readonly ProductSearchService _productSearchService;
+        private readonly IOrderReceiptPdfService _orderReceiptPdfService;
 
 
         public OrderController(
             ApplicationDbContext context,
-            ProductSearchService productSearchService)
+            ProductSearchService productSearchService,
+            IOrderReceiptPdfService orderReceiptPdfService)
         {
             _context = context;
             _productSearchService = productSearchService;
+            _orderReceiptPdfService = orderReceiptPdfService;
         }
 
 
@@ -84,6 +89,8 @@ namespace GreenMart.Controllers
                 .ToList();
 
             ViewBag.HasFilters = false;
+
+            LoadCustomerDeliveryData(products.Select(x => x.OrderId));
 
             return View(products);
 
@@ -183,6 +190,8 @@ namespace GreenMart.Controllers
 
 
             ViewBag.HasFilters = false;
+
+            LoadOwnerDeliveryData(products.Select(x => x.OrderId));
 
 
             return View(products);
@@ -399,6 +408,8 @@ namespace GreenMart.Controllers
                 || FromDate.HasValue
                 || ToDate.HasValue
                 || !string.IsNullOrWhiteSpace(SortBy);
+
+            LoadCustomerDeliveryData(result.Select(x => x.OrderId));
 
             return PartialView(
                 "_OrderGrid",
@@ -621,6 +632,8 @@ namespace GreenMart.Controllers
                 || FromDate.HasValue
                 || ToDate.HasValue;
 
+            LoadOwnerDeliveryData(result.Select(x => x.OrderId));
+
 
 
             return PartialView(
@@ -840,6 +853,9 @@ namespace GreenMart.Controllers
                         SellerEmail =
                         x.Product.User.Email,
 
+                        SellerId =
+                        x.Product.UserId,
+
 
                         Quantity =
                         x.Quantity,
@@ -871,6 +887,108 @@ namespace GreenMart.Controllers
                     }
                 );
 
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet]
+        public IActionResult DownloadReceipt(int orderId)
+        {
+            if (!int.TryParse(User.FindFirst("UserId")?.Value, out var customerId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var order = _context.Orders
+                .Include(x => x.User)
+                .Include(x => x.OrderItems)!
+                    .ThenInclude(x => x.Product)
+                        .ThenInclude(x => x.User)
+                .FirstOrDefault(x => x.OrderId == orderId && x.UserId == customerId);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            if (order.Status == "Rejected")
+            {
+                TempData["OrderMessage"] = "A receipt is not available for a rejected order.";
+                return RedirectToAction(nameof(MyOrders));
+            }
+
+            var assignments = _context.DeliveryAssignments
+                .Include(x => x.Seller)
+                .Include(x => x.DeliveryMan)
+                .Where(x => x.OrderId == orderId)
+                .ToList();
+
+            var pdf = _orderReceiptPdfService.Create(order, assignments);
+            return File(
+                pdf,
+                "application/pdf",
+                $"GreenMart-Order-{order.OrderId}-Receipt.pdf"
+            );
+        }
+
+        private void LoadOwnerDeliveryData(IEnumerable<int> orderIds)
+        {
+            if (!int.TryParse(User.FindFirst("UserId")?.Value, out var sellerId))
+            {
+                ViewBag.AvailableDeliveryMen = new List<AvailableDeliveryManViewModel>();
+                ViewBag.OwnerDeliveryAssignments = new Dictionary<int, DeliveryAssignment>();
+                return;
+            }
+
+            var ids = orderIds.Distinct().ToList();
+            var assignments = _context.DeliveryAssignments
+                .Include(x => x.DeliveryMan)
+                .Include(x => x.Rating)
+                .Where(x => ids.Contains(x.OrderId) && x.SellerId == sellerId)
+                .ToDictionary(x => x.OrderId);
+
+            var applications = _context.DeliveryManApplications
+                .Include(x => x.User)
+                .Where(x => x.Status == "Approved" && x.IsAvailable)
+                .OrderBy(x => x.User.FullName)
+                .ToList();
+
+            var deliveryManIds = applications.Select(x => x.UserId).ToList();
+            var ratingStats = _context.DeliveryRatings
+                .Where(x => deliveryManIds.Contains(x.DeliveryManId))
+                .GroupBy(x => x.DeliveryManId)
+                .Select(x => new { UserId = x.Key, Average = x.Average(r => r.RatingValue), Count = x.Count() })
+                .ToDictionary(x => x.UserId);
+
+            ViewBag.AvailableDeliveryMen = applications.Select(x =>
+            {
+                ratingStats.TryGetValue(x.UserId, out var stats);
+                return new AvailableDeliveryManViewModel
+                {
+                    UserId = x.UserId,
+                    FullName = x.User.FullName,
+                    VehicleType = x.VehicleType,
+                    VehicleNumber = x.VehicleNumber,
+                    AverageRating = stats?.Average ?? 0,
+                    RatingCount = stats?.Count ?? 0
+                };
+            }).ToList();
+            ViewBag.OwnerDeliveryAssignments = assignments;
+
+            var seller = _context.Users.First(x => x.UserId == sellerId);
+            ViewBag.SellerPickupAddress = seller.Address ?? string.Empty;
+            ViewBag.SellerPickupPhone = seller.PhoneNumber;
+        }
+
+        private void LoadCustomerDeliveryData(IEnumerable<int> orderIds)
+        {
+            var ids = orderIds.Distinct().ToList();
+            ViewBag.CustomerDeliveryAssignments = _context.DeliveryAssignments
+                .Include(x => x.DeliveryMan)
+                .Include(x => x.Seller)
+                .Include(x => x.Rating)
+                .Where(x => ids.Contains(x.OrderId))
+                .GroupBy(x => x.OrderId)
+                .ToDictionary(x => x.Key, x => x.ToList());
         }
 
         private IQueryable<OrderProductSearchResultDto> GetOwnerOrderProducts()
@@ -923,6 +1041,9 @@ namespace GreenMart.Controllers
 
                         CategoryId =
                             x.Product.CategoryId,
+
+                        SellerId =
+                            x.Product.UserId,
 
                         BuyerName =
                             x.Order.User.FullName,

@@ -404,3 +404,52 @@
         transform: translateY(0);
     }
 }
+
+.order-receipt-download {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 15px;
+    padding: 12px 14px;
+    border: 1px solid rgba(5, 150, 105, .2);
+    border-radius: 14px;
+    background: #f0fdf4;
+    color: #065f46;
+    text-decoration: none;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.order-receipt-download:hover {
+    border-color: rgba(5, 150, 105, .42);
+    color: #064e3b;
+    transform: translateY(-1px);
+    box-shadow: 0 9px 20px rgba(6, 95, 70, .1);
+}
+
+.receipt-download-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    border-radius: 11px;
+    background: #047857;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .06em;
+}
+
+.order-receipt-download span:last-child {
+    display: grid;
+    gap: 2px;
+}
+
+.order-receipt-download strong {
+    font-size: 13px;
+}
+
+.order-receipt-download small {
+    color: #64748b;
+    font-size: 11px;
+}

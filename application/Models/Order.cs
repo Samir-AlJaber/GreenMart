@@ -32,6 +32,12 @@ namespace GreenMart.Models
 
         public string? ShippingAddress { get; set; }
 
+        [Column(TypeName = "decimal(9,6)")]
+        public decimal? ShippingLatitude { get; set; }
+
+        [Column(TypeName = "decimal(9,6)")]
+        public decimal? ShippingLongitude { get; set; }
+
 
         public string? RejectionReason { get; set; }
 

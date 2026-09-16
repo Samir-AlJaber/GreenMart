@@ -58,53 +58,76 @@
                      User.Identity.IsAuthenticated)
                 {
 
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin"
+                           asp-action="Dashboard">
+                            Admin Dashboard
+                        </a>
+                    }
 
-                    <a asp-controller="Product"
-                       asp-action="Create">
-
-                        Sell Product
-
-                    </a>
-
-
-
-
-
-                    <a asp-controller="Product"
-                       asp-action="MyProducts">
-
-                        My Products
-
-                    </a>
-
-
-                    <a asp-controller="Order"
-                       asp-action="MyOrders">
-
-                        My Orders
-
-                    </a>
-
-                    <a asp-controller="Order"
-                       asp-action="OwnerOrders">
-
-                        Order History
-
-                    </a>
+                    @if (User.IsInRole("DeliveryMan"))
+                    {
+                        <a asp-controller="Delivery"
+                           asp-action="Dashboard">
+                            Delivery Dashboard
+                        </a>
+                        <a asp-controller="Delivery"
+                           asp-action="Profile">
+                            Delivery Profile
+                        </a>
+                    }
 
 
-                    <a asp-controller="Cart"
-                       asp-action="Index"
-                       class="cart-link">
+                    @if (User.IsInRole("User"))
+                    {
+                        <a asp-controller="Product"
+                           asp-action="Create">
 
-                        🛒 Cart
+                            Sell Product
 
-                        <span class="cart-badge"
-                              id="cartCountBadge">
-                            @await Component.InvokeAsync("CartCount")
-                        </span>
+                        </a>
 
-                    </a>
+
+
+
+
+                        <a asp-controller="Product"
+                           asp-action="MyProducts">
+
+                            My Products
+
+                        </a>
+
+
+                        <a asp-controller="Order"
+                           asp-action="MyOrders">
+
+                            My Orders
+
+                        </a>
+
+                        <a asp-controller="Order"
+                           asp-action="OwnerOrders">
+
+                            Order History
+
+                        </a>
+
+
+                        <a asp-controller="Cart"
+                           asp-action="Index"
+                           class="cart-link">
+
+                            🛒 Cart
+
+                            <span class="cart-badge"
+                                  id="cartCountBadge">
+                                @await Component.InvokeAsync("CartCount")
+                            </span>
+
+                        </a>
+                    }
 
 
                 }

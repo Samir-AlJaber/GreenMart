@@ -20,21 +20,32 @@
 
 
         <h1>
-            Registration Successful!
+            @(ViewBag.IsDeliveryApplication == true
+                ? "Request sent to admin"
+                : "Registration Successful!")
         </h1>
 
 
 
 
         <p>
-            Your GreenMart account has been created successfully.
+            @if (ViewBag.IsDeliveryApplication == true)
+            {
+                <text>Your delivery partner request is pending. Please wait for admin approval before logging in.</text>
+            }
+            else
+            {
+                <text>Your GreenMart account has been created successfully.</text>
+            }
         </p>
 
 
 
 
         <span>
-            Redirecting you to login...
+            @(ViewBag.IsDeliveryApplication == true
+                ? "We will email you when your account is approved."
+                : "Redirecting you to login...")
         </span>
 
 
@@ -57,7 +68,7 @@
         window.location.href = "/Account/Login";
 
 
-    }, 3000);
+    }, @(ViewBag.IsDeliveryApplication == true ? 6500 : 3000));
 
 
 </script>

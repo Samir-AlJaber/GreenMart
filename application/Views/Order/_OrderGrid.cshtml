@@ -1,4 +1,20 @@
 @model IEnumerable<GreenMart.DTOs.OrderProductSearchResultDto>
+@using GreenMart.Models
+
+@{
+    var deliveryAssignments = ViewBag.CustomerDeliveryAssignments as Dictionary<int, List<DeliveryAssignment>>
+        ?? new Dictionary<int, List<DeliveryAssignment>>();
+    var receiptOrderIds = new HashSet<int>();
+
+    string DeliveryStatus(string status) => status switch
+    {
+        "GoingToPickup" => "Going to seller",
+        "ArrivedAtPickup" => "Arrived at seller",
+        "PickedUp" => "Product picked up",
+        "OnTheWay" => "On the way to you",
+        _ => status
+    };
+}
 
 
 
@@ -46,6 +62,12 @@ else
 
         @foreach(var product in Model)
         {
+
+            DeliveryAssignment? deliveryAssignment = null;
+            if (deliveryAssignments.TryGetValue(product.OrderId, out var orderAssignments))
+            {
+                deliveryAssignment = orderAssignments.FirstOrDefault(x => x.SellerId == product.SellerId);
+            }
 
 
             <div class="product-card-custom order-card-custom">
@@ -170,6 +192,21 @@ else
 
                 </div>
 
+                @if (product.OrderStatus != "Rejected" &&
+                     receiptOrderIds.Add(product.OrderId))
+                {
+                    <a asp-controller="Order"
+                       asp-action="DownloadReceipt"
+                       asp-route-orderId="@product.OrderId"
+                       class="order-receipt-download">
+                        <span class="receipt-download-icon" aria-hidden="true">PDF</span>
+                        <span>
+                            <strong>Download receipt for order #@product.OrderId</strong>
+                            <small>Save or show it to your delivery partner</small>
+                        </span>
+                    </a>
+                }
+
 
 
 
@@ -217,6 +254,47 @@ else
 
                         </div>
 
+                    }
+
+                    @if (deliveryAssignment != null)
+                    {
+                        <div class="delivery-assignment-panel customer-delivery-panel">
+                            <span class="delivery-panel-label">Delivery</span>
+                            <div class="assigned-delivery-person">
+                                <strong>@deliveryAssignment.DeliveryMan.FullName</strong>
+                                <span>@DeliveryStatus(deliveryAssignment.Status)</span>
+                            </div>
+                            <a asp-controller="Delivery"
+                               asp-action="Track"
+                               asp-route-assignmentId="@deliveryAssignment.DeliveryAssignmentId"
+                               class="track-delivery-link">
+                                Track delivery partner
+                            </a>
+
+                            @if (deliveryAssignment.Status == "Delivered" && deliveryAssignment.Rating == null)
+                            {
+                                <form asp-controller="Delivery" asp-action="Rate" method="post" class="delivery-rating-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="assignmentId" value="@deliveryAssignment.DeliveryAssignmentId" />
+                                    <select name="ratingValue" required aria-label="Rate your delivery partner">
+                                        <option value="">Rate this delivery</option>
+                                        <option value="1">★☆☆☆☆ Poor</option>
+                                        <option value="2">★★☆☆☆ Fair</option>
+                                        <option value="3">★★★☆☆ Good</option>
+                                        <option value="4">★★★★☆ Very Good</option>
+                                        <option value="5">★★★★★ Excellent</option>
+                                    </select>
+                                    <button type="submit">Submit rating</button>
+                                </form>
+                            }
+                            else if (deliveryAssignment.Rating != null)
+                            {
+                                <div class="saved-delivery-rating" aria-label="Your delivery rating">
+                                    <span class="rating-stars">@(new string('★', deliveryAssignment.Rating.RatingValue))@(new string('☆', 5 - deliveryAssignment.Rating.RatingValue))</span>
+                                    <span>@deliveryAssignment.Rating.RatingLabel</span>
+                                </div>
+                            }
+                        </div>
                     }
 
 

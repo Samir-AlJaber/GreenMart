@@ -28,6 +28,8 @@ namespace GreenMart.DTOs
 
         public string SellerEmail { get; set; }
 
+        public int SellerId { get; set; }
+
 
         public int Quantity { get; set; }
 

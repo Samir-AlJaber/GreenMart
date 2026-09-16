@@ -1,4 +1,4 @@
-﻿@model GreenMart.Models.User
+﻿@model GreenMart.Models.RegisterViewModel
 
 @{
     ViewData["Title"] = "Register";
@@ -120,6 +120,8 @@
 
                     <span id="generalError"></span>
 
+                    <div asp-validation-summary="All"></div>
+
                 </div>
 
 
@@ -202,7 +204,7 @@
 
                         <input type="password"
                                id="password"
-                               name="PasswordHash"
+                               name="Password"
                                placeholder="Create password"
                                required />
 
@@ -221,7 +223,7 @@
 
 
                     <span class="field-error"
-                          data-error="PasswordHash">
+                          data-error="Password">
 
                     </span>
 
@@ -249,6 +251,7 @@
 
                         <input type="password"
                                id="confirmPassword"
+                               name="ConfirmPassword"
                                placeholder="Confirm password"
                                required />
 
@@ -337,6 +340,65 @@
 
 
 
+                <div class="input-group">
+
+                    <label for="accountType">I want to join as</label>
+
+                    <select id="accountType"
+                            name="AccountType"
+                            data-current-value="@Model.AccountType"
+                            class="register-select">
+                        <option value="Customer">Customer / seller</option>
+                        <option value="DeliveryMan">Delivery partner</option>
+                    </select>
+
+                </div>
+
+
+                <div id="deliveryApplicationFields"
+                     class="delivery-application-fields"
+                     hidden>
+
+                    <div class="delivery-application-heading">
+                        <strong>Delivery partner information</strong>
+                        <span>An admin will review these details before you can log in.</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="nidNumber">NID Number</label>
+                        <input id="nidNumber"
+                               name="NidNumber"
+                               value="@Model.NidNumber"
+                               placeholder="Enter your NID number" />
+                        <span asp-validation-for="NidNumber" class="field-error"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="vehicleType">Vehicle Type</label>
+                        <select id="vehicleType"
+                                name="VehicleType"
+                                data-current-value="@Model.VehicleType"
+                                class="register-select">
+                            <option value="">Select vehicle</option>
+                            <option value="Bicycle">Bicycle</option>
+                            <option value="Motorcycle">Motorcycle</option>
+                            <option value="Scooter">Scooter</option>
+                        </select>
+                        <span asp-validation-for="VehicleType" class="field-error"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="vehicleNumber">Vehicle Number</label>
+                        <input id="vehicleNumber"
+                               name="VehicleNumber"
+                               value="@Model.VehicleNumber"
+                               placeholder="Example: DHAKA METRO-LA-12-3456" />
+                        <span asp-validation-for="VehicleNumber" class="field-error"></span>
+                    </div>
+
+                </div>
+
+
                 <button type="submit"
                         class="register-submit">
 
@@ -399,6 +461,27 @@
 
         const form =
             document.getElementById("registerForm");
+
+        const accountType = document.getElementById("accountType");
+        const deliveryFields = document.getElementById("deliveryApplicationFields");
+        const deliveryInputs = [
+            document.getElementById("nidNumber"),
+            document.getElementById("vehicleType"),
+            document.getElementById("vehicleNumber")
+        ];
+
+        accountType.value = accountType.dataset.currentValue || "Customer";
+        document.getElementById("vehicleType").value =
+            document.getElementById("vehicleType").dataset.currentValue || "";
+
+        function updateAccountType() {
+            const isDeliveryPartner = accountType.value === "DeliveryMan";
+            deliveryFields.hidden = !isDeliveryPartner;
+            deliveryInputs.forEach(input => input.required = isDeliveryPartner);
+        }
+
+        accountType.addEventListener("change", updateAccountType);
+        updateAccountType();
 
 
 
@@ -521,7 +604,7 @@
                 if (password.length < 8) {
 
                     showError(
-                        "PasswordHash",
+                        "Password",
                         "Password must be at least 8 characters"
                     );
 
@@ -532,7 +615,7 @@
                 else if (!/[A-Z]/.test(password)) {
 
                     showError(
-                        "PasswordHash",
+                        "Password",
                         "Password must contain an uppercase letter"
                     );
 
@@ -543,7 +626,7 @@
                 else if (!/[a-z]/.test(password)) {
 
                     showError(
-                        "PasswordHash",
+                        "Password",
                         "Password must contain a lowercase letter"
                     );
 
@@ -554,7 +637,7 @@
                 else if (!/[0-9]/.test(password)) {
 
                     showError(
-                        "PasswordHash",
+                        "Password",
                         "Password must contain a digit"
                     );
 
@@ -595,6 +678,18 @@
 
                     valid = false;
 
+                }
+
+
+                if (accountType.value === "DeliveryMan") {
+                    const hasMissingDeliveryInformation =
+                        deliveryInputs.some(input => !input.value.trim());
+
+                    if (hasMissingDeliveryInformation) {
+                        document.getElementById("generalError").textContent =
+                            "Please complete all delivery partner information.";
+                        valid = false;
+                    }
                 }
 
 

@@ -78,8 +78,21 @@
                 </label>
 
                 <textarea name="ShippingAddress"
+                          id="shippingAddress"
                           rows="4"
                           required>@Model.User.Address</textarea>
+
+                <input type="hidden" name="ShippingLatitude" id="shippingLatitude" />
+                <input type="hidden" name="ShippingLongitude" id="shippingLongitude" />
+
+                <button type="button"
+                        class="location-picker-trigger js-location-picker"
+                        data-address-target="#shippingAddress"
+                        data-latitude-target="#shippingLatitude"
+                        data-longitude-target="#shippingLongitude"
+                        data-picker-title="Choose delivery location">
+                    Set exact location on map
+                </button>
 
                          <p id="addressError"
                            class="checkout-error">
@@ -217,13 +230,20 @@
 
 </div>
 
+<partial name="_LocationPicker" />
+
 
 
 <div class="order-success-message"
      id="orderSuccessMessage"
      style="display:none;">
 
-    Order placed successfully.
+    <strong>Order placed successfully</strong>
+    <span>Your PDF receipt is ready to save or show to the delivery partner.</span>
+    <div class="order-success-actions">
+        <a id="downloadOrderReceipt" href="#">Download PDF receipt</a>
+        <a asp-controller="Order" asp-action="MyOrders" class="success-orders-link">View My Orders</a>
+    </div>
 
 </div>
 
@@ -270,6 +290,9 @@
                             )
                             .value;
 
+                        let latitude = document.getElementById("shippingLatitude").value;
+                        let longitude = document.getElementById("shippingLongitude").value;
+
 
 
                         document
@@ -304,7 +327,7 @@
 
 
                                 body:
-                                `PhoneNumber=${encodeURIComponent(phone)}&ShippingAddress=${encodeURIComponent(address)}`
+                                `PhoneNumber=${encodeURIComponent(phone)}&ShippingAddress=${encodeURIComponent(address)}&ShippingLatitude=${encodeURIComponent(latitude)}&ShippingLongitude=${encodeURIComponent(longitude)}`
 
                             }
                         )
@@ -416,6 +439,9 @@
             )
             .value;
 
+        let latitude = document.getElementById("shippingLatitude").value;
+        let longitude = document.getElementById("shippingLongitude").value;
+
 
 
         fetch(
@@ -432,7 +458,7 @@
 
 
                 body:
-                `PhoneNumber=${encodeURIComponent(phone)}&ShippingAddress=${encodeURIComponent(address)}`
+                `PhoneNumber=${encodeURIComponent(phone)}&ShippingAddress=${encodeURIComponent(address)}&ShippingLatitude=${encodeURIComponent(latitude)}&ShippingLongitude=${encodeURIComponent(longitude)}`
 
             }
         )
@@ -458,7 +484,12 @@
 
                     document
                     .getElementById("orderSuccessMessage")
-                    .style.display = "block";
+                    .style.display = "grid";
+
+                    document
+                    .getElementById("downloadOrderReceipt")
+                    .href =
+                    `/Order/DownloadReceipt?orderId=${data.orderId}`;
 
                     fetch("/Cart/CartCount")
                         .then(response => response.json())
@@ -475,17 +506,6 @@
                         }
 
                     });
-
-                    setTimeout(
-                        function()
-                        {
-
-                            window.location.href =
-                            "/Order/MyOrders";
-
-                        },
-                        3000
-                    );
 
                 }
 

@@ -72,7 +72,9 @@ namespace GreenMart.Controllers
         [HttpPost]
         public IActionResult ValidateOrder(
     string PhoneNumber,
-    string ShippingAddress)
+    string ShippingAddress,
+    decimal? ShippingLatitude,
+    decimal? ShippingLongitude)
         {
 
             string? phoneError = null;
@@ -94,6 +96,11 @@ namespace GreenMart.Controllers
             {
                 addressError =
                     "Please provide a delivery address.";
+            }
+
+            if (!CoordinatesAreValid(ShippingLatitude, ShippingLongitude))
+            {
+                addressError = "Please choose a valid delivery location on the map.";
             }
 
 
@@ -150,7 +157,9 @@ namespace GreenMart.Controllers
         [HttpPost]
                 public IActionResult PlaceOrder(
             string PhoneNumber,
-            string ShippingAddress)
+            string ShippingAddress,
+            decimal? ShippingLatitude,
+            decimal? ShippingLongitude)
         {
 
             string? phoneError = null;
@@ -172,6 +181,11 @@ namespace GreenMart.Controllers
             {
                 addressError =
                     "Please provide a delivery address.";
+            }
+
+            if (!CoordinatesAreValid(ShippingLatitude, ShippingLongitude))
+            {
+                addressError = "Please choose a valid delivery location on the map.";
             }
 
 
@@ -233,6 +247,8 @@ namespace GreenMart.Controllers
                     UserId = userId,
                     TotalAmount = totalAmount,
                     ShippingAddress = ShippingAddress,
+                    ShippingLatitude = ShippingLatitude.HasValue ? decimal.Round(ShippingLatitude.Value, 6) : null,
+                    ShippingLongitude = ShippingLongitude.HasValue ? decimal.Round(ShippingLongitude.Value, 6) : null,
                     Status = "Pending"
                 };
 
@@ -275,6 +291,15 @@ namespace GreenMart.Controllers
                 orderId = order.OrderId
             });
 
+        }
+
+        private static bool CoordinatesAreValid(decimal? latitude, decimal? longitude)
+        {
+            if (!latitude.HasValue && !longitude.HasValue) return true;
+            if (!latitude.HasValue || !longitude.HasValue) return false;
+
+            return latitude.Value is >= -90 and <= 90 &&
+                   longitude.Value is >= -180 and <= 180;
         }
     }
 }
