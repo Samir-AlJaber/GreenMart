@@ -1,0 +1,34 @@
+@model GreenMart.Models.PaymentResultViewModel
+
+@{
+    ViewData["Title"] = "Payment result";
+    var isPaid = Model.Status == "Paid";
+    var isCancelled = Model.Status == "Cancelled";
+}
+
+<section class="payment-result-page">
+    <div class="payment-result-card @(isPaid ? "is-success" : "is-unsuccessful")">
+        <div class="payment-result-mark" aria-hidden="true">@(isPaid ? "✓" : isCancelled ? "—" : "!")</div>
+        <p class="payment-result-eyebrow">Order #@Model.OrderId</p>
+        <h1>@(isPaid ? "Payment successful" : isCancelled ? "Payment cancelled" : "Payment not completed")</h1>
+        <p class="payment-result-message">@Model.Message</p>
+
+        <dl class="payment-result-details">
+            <div><dt>Amount</dt><dd>৳@Model.Amount.ToString("0.00")</dd></div>
+            <div><dt>Method</dt><dd>@Model.PaymentMethod</dd></div>
+            <div><dt>Status</dt><dd>@Model.Status</dd></div>
+        </dl>
+
+        <div class="payment-result-actions">
+            @if (Model.CanDownloadReceipt)
+            {
+                <a asp-controller="Order" asp-action="DownloadReceipt" asp-route-orderId="@Model.OrderId" class="payment-primary-action">Download PDF receipt</a>
+            }
+            <a asp-controller="Order" asp-action="MyOrders" class="payment-secondary-action">View my orders</a>
+            @if (!isPaid)
+            {
+                <a asp-controller="Cart" asp-action="Index" class="payment-secondary-action">Return to cart</a>
+            }
+        </div>
+    </div>
+</section>
