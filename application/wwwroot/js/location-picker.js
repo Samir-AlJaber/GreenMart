@@ -12,6 +12,34 @@
     const confirmButton = document.getElementById("locationPickerConfirm");
     const addressOutput = document.getElementById("locationPickerAddress");
     const hint = document.getElementById("locationPickerHint");
+    const suggestions = document.getElementById("locationPickerSuggestions");
+    const searchStatus = document.getElementById("locationPickerSearchStatus");
+    const historyKey = modal.dataset.userId ? `greenmart.locations.${modal.dataset.userId}` : null;
+    let searchSequence = 0;
+    let searchTimer;
+    let sessionToken;
+    let gpsWatch;
+    let gpsTimer;
+    let rows = [];
+    let activeRow = -1;
+    const cleanAddress = value => (value || "").replace(/\b[23456789CFGHJMPQRVWX]{2,8}\+[23456789CFGHJMPQRVWX]{2,}\b,?\s*/gi, "").trim();
+    const recentLocations = () => {
+        try {
+            const saved = JSON.parse(historyKey ? localStorage.getItem(historyKey) || "[]" : "[]");
+            return Array.isArray(saved) ? saved.filter(x => typeof x.address === "string" && Number.isFinite(x.lat) && Number.isFinite(x.lng) && Math.abs(x.lat) <= 90 && Math.abs(x.lng) <= 180).slice(0, 6) : [];
+        } catch { return []; }
+    };
+    const hideSuggestions = () => {
+        suggestions.hidden = true;
+        search.setAttribute("aria-expanded", "false");
+        search.removeAttribute("aria-activedescendant");
+        activeRow = -1;
+    };
+    const stopGps = () => {
+        if (gpsWatch !== undefined) navigator.geolocation.clearWatch(gpsWatch);
+        gpsWatch = undefined;
+        clearTimeout(gpsTimer);
+    };
     const defaultCenter = { lat: 23.8103, lng: 90.4125 };
 
     let map;
@@ -52,7 +80,7 @@
             };
             script.async = true;
             script.defer = true;
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&callback=${callbackName}&libraries=places&v=weekly&loading=async`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&callback=${callbackName}&libraries=places&v=weekly&loading=async&language=en&region=BD`;
             script.onerror = () => {
                 delete window[callbackName];
                 reject(new Error("Google Maps could not be loaded."));
@@ -89,8 +117,7 @@
 
             if (!places?.length) return "";
             const place = places[0];
-            if (place.formattedAddress) return place.formattedAddress;
-            return place.displayName ? `${place.displayName}, nearby` : "";
+            return place.displayName ? `Near ${cleanAddress(place.displayName)} (nearby landmark)` : "";
         } catch {
             return "";
         }
@@ -98,8 +125,15 @@
 
     const resolveReadableAddress = async position => {
         try {
-            const response = await geocoder.geocode({ location: position });
-            if (response.results?.length) return response.results[0].formatted_address;
+            const response = await geocoder.geocode({ location: position, language: "en", region: "BD" });
+            const results = (response.results || []).filter(x => !x.types.includes("plus_code"));
+            const preferred = ["street_address", "premise", "route", "neighborhood", "sublocality", "locality"];
+            results.sort((a, b) => {
+                const rank = x => { const i = preferred.findIndex(t => x.types.includes(t)); return i < 0 ? 99 : i; };
+                return rank(a) - rank(b);
+            });
+            const readable = results.map(x => cleanAddress(x.formatted_address)).find(Boolean);
+            if (readable) return readable;
         } catch {
             // The demo key can reject the classic geocoder. Try Places next.
         }
@@ -107,7 +141,11 @@
         return await findNearestPlace(position);
     };
 
-    const choosePosition = async (position, reverseGeocode = true) => {
+    const choosePosition = async (position, reverseGeocode = true, accuracyText = "") => {
+        const lookupSequence = ++reverseLookupSequence;
+        ++searchSequence;
+        clearTimeout(searchTimer);
+        hideSuggestions();
         selectedPosition = {
             lat: Number(position.lat),
             lng: Number(position.lng)
@@ -122,6 +160,7 @@
                 title: "Drag to adjust the exact location"
             });
             marker.addListener("dragend", () => {
+                stopGps();
                 const position = marker.getPosition();
                 accuracyCircle?.setMap(null);
                 accuracyCircle = null;
@@ -132,24 +171,24 @@
         }
 
         map.panTo(selectedPosition);
-        confirmButton.disabled = false;
+        confirmButton.disabled = reverseGeocode;
 
         if (!reverseGeocode) {
             return;
         }
 
-        const lookupSequence = ++reverseLookupSequence;
         setBusy(true);
         const resolvedAddress = await resolveReadableAddress(selectedPosition);
         if (lookupSequence !== reverseLookupSequence) return;
 
         setBusy(false);
+        confirmButton.disabled = false;
         selectedAddress = resolvedAddress || `Pinned location (${formattedCoordinates(selectedPosition)})`;
         addressOutput.textContent = selectedAddress;
         search.value = resolvedAddress || "";
-        hint.textContent = resolvedAddress
+        hint.textContent = accuracyText || (resolvedAddress
             ? "Check the pin and drag it if the entrance is not exactly here."
-            : "The exact pin will still be saved even though Google has no street address for this point.";
+            : "The exact pin will still be saved even though Google has no street address for this point.");
     };
 
     const initializeMap = () => {
@@ -168,31 +207,114 @@
             gestureHandling: "greedy"
         });
         map.addListener("click", event => {
+            stopGps();
             accuracyCircle?.setMap(null);
             accuracyCircle = null;
+            if (event.placeId) {
+                event.stop();
+                void selectSuggestion({
+                    label: "Selected landmark",
+                    prediction: { toPlace: () => new google.maps.places.Place({ id: event.placeId, requestedLanguage: "en" }) }
+                });
+                return;
+            }
             void choosePosition({ lat: event.latLng.lat(), lng: event.latLng.lng() });
         });
     };
 
-    const findAddress = () => {
-        const query = search.value.trim();
-        if (!query || !geocoder) return;
-
-        setBusy(true);
-        geocoder.geocode({ address: query, region: "BD" }, (results, status) => {
-            setBusy(false);
-            if (status !== "OK" || !results?.length) {
-                showError("We could not find that address. Try an area name or nearby landmark.");
-                return;
-            }
-
-            const location = results[0].geometry.location;
-            selectedAddress = results[0].formatted_address;
-            search.value = selectedAddress;
-            addressOutput.textContent = selectedAddress;
-            map.setZoom(17);
-            void choosePosition({ lat: location.lat(), lng: location.lng() }, false);
+    const renderSuggestions = entries => {
+        rows = entries;
+        suggestions.replaceChildren();
+        activeRow = -1;
+        search.removeAttribute("aria-activedescendant");
+        entries.forEach((entry, i) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.id = `location-option-${i}`;
+            button.setAttribute("role", "option");
+            button.setAttribute("aria-selected", "false");
+            button.textContent = entry.label;
+            const detail = document.createElement("small");
+            detail.textContent = entry.recent ? "Recently selected on this browser" : "Matching location";
+            button.appendChild(detail);
+            button.addEventListener("click", () => void selectSuggestion(entry));
+            suggestions.appendChild(button);
         });
+        suggestions.hidden = entries.length === 0;
+        search.setAttribute("aria-expanded", String(entries.length > 0));
+    };
+
+    const selectSuggestion = async entry => {
+        stopGps();
+        const sequence = ++searchSequence;
+        ++reverseLookupSequence;
+        clearTimeout(searchTimer);
+        hideSuggestions();
+        confirmButton.disabled = true;
+        setBusy(true, "Loading selected location...");
+        try {
+            let position = entry.position;
+            let address = entry.label;
+            if (entry.prediction) {
+                const place = entry.prediction.toPlace();
+                await place.fetchFields({ fields: ["location", "displayName", "formattedAddress"] });
+                if (!place.location) throw new Error("No coordinates");
+                position = { lat: place.location.lat(), lng: place.location.lng() };
+                const name = cleanAddress(place.displayName);
+                const full = cleanAddress(place.formattedAddress);
+                address = name && !full.toLowerCase().includes(name.toLowerCase()) ? `${name}, ${full}` : full || name;
+                sessionToken = null;
+            }
+            if (sequence !== searchSequence) return;
+            accuracyCircle?.setMap(null);
+            accuracyCircle = null;
+            selectedAddress = address;
+            search.value = address;
+            addressOutput.textContent = address;
+            map.setZoom(17);
+            await choosePosition(position, false);
+            hint.textContent = "Check the pin, then drag it to your entrance if needed.";
+            searchStatus.textContent = "";
+            setBusy(false);
+        } catch {
+            if (sequence === searchSequence) showError("This place could not be loaded. Choose another result or tap the map.");
+        }
+    };
+
+    const findAddress = async () => {
+        stopGps();
+        ++reverseLookupSequence;
+        setBusy(false);
+        confirmButton.disabled = true;
+        const query = search.value.trim();
+        const sequence = ++searchSequence;
+        const recent = recentLocations().filter(x => x.address.toLowerCase().includes(query.toLowerCase()))
+            .map(x => ({ label: x.address, position: { lat: x.lat, lng: x.lng }, recent: true }));
+        renderSuggestions(recent);
+        if (!query || !geocoder) { searchStatus.textContent = recent.length ? "Choose a recent location or type to search Bangladesh." : "Type a place name to see matching locations in Bangladesh."; return; }
+        searchStatus.textContent = "Finding matching locations...";
+        let entries = [];
+        let unavailable = false;
+        try {
+            const { AutocompleteSuggestion, AutocompleteSessionToken } = await google.maps.importLibrary("places");
+            sessionToken ||= new AutocompleteSessionToken();
+            const response = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+                input: query, includedRegionCodes: ["bd"], language: "en", region: "bd",
+                locationBias: { center: map.getCenter().toJSON(), radius: 30000 }, sessionToken
+            });
+            entries = response.suggestions.filter(x => x.placePrediction).map(x => ({ label: x.placePrediction.text.toString(), prediction: x.placePrediction }));
+        } catch {
+            unavailable = true;
+            try {
+                const response = await geocoder.geocode({ address: query, componentRestrictions: { country: "BD" }, language: "en", region: "BD" });
+                entries = response.results.map(x => ({ label: cleanAddress(x.formatted_address), position: x.geometry.location.toJSON() }));
+            } catch { /* Show recent entries and a useful status without moving the pin. */ }
+        }
+        if (sequence !== searchSequence) return;
+        renderSuggestions([...recent, ...entries].slice(0, 10));
+        searchStatus.textContent = entries.length ? "Choose the matching location below." : unavailable
+            ? "Place search is unavailable. Try a complete address, choose a recent location, or tap the map."
+            : "No matching places. Add a road, area or city to your search.";
     };
 
     const useCurrentLocation = () => {
@@ -201,10 +323,21 @@
             return;
         }
 
-        setBusy(true, "Getting a precise location from your device...");
-        navigator.geolocation.getCurrentPosition(
-            position => {
-                setBusy(false);
+        stopGps();
+        ++reverseLookupSequence;
+        ++searchSequence;
+        clearTimeout(searchTimer);
+        hideSuggestions();
+        confirmButton.disabled = true;
+        let bestPosition;
+        setBusy(true, "Improving your device location (up to 12 seconds)...");
+        const finish = () => {
+                stopGps();
+                if (!bestPosition) {
+                    showError("Your location could not be detected. Search for an address or tap the map.");
+                    return;
+                }
+                const position = bestPosition;
                 const currentPosition = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
@@ -223,10 +356,18 @@
                 });
 
                 map.setZoom(position.coords.accuracy > 500 ? 15 : position.coords.accuracy > 100 ? 16 : 18);
-                hint.textContent = `Your device reports accuracy within about ${Math.round(position.coords.accuracy)} metres. You can tap the map or drag the pin to correct it.`;
-                void choosePosition(currentPosition);
+                const accuracyText = `Device accuracy: about ${Math.round(position.coords.accuracy)} metres. Check the blue circle and drag the pin to your entrance. The address describes the pinned area.`;
+                void choosePosition(currentPosition, true, accuracyText);
+        };
+        gpsTimer = setTimeout(finish, 12000);
+        gpsWatch = navigator.geolocation.watchPosition(
+            position => {
+                if (!bestPosition || position.coords.accuracy < bestPosition.coords.accuracy) bestPosition = position;
+                if (bestPosition.coords.accuracy <= 30) finish();
             },
             error => {
+                if (bestPosition) { finish(); return; }
+                stopGps();
                 const message = error.code === 1
                     ? "Location permission was not allowed. Search or tap the map instead."
                     : "Your exact location could not be detected. Search or tap the map instead.";
@@ -237,6 +378,12 @@
     };
 
     const closePicker = () => {
+        stopGps();
+        clearTimeout(searchTimer);
+        ++searchSequence;
+        ++reverseLookupSequence;
+        hideSuggestions();
+        sessionToken = null;
         modal.classList.remove("is-open");
         modal.setAttribute("aria-hidden", "true");
         document.body.classList.remove("location-picker-open");
@@ -252,7 +399,7 @@
         search.value = activeAddressInput.value.trim();
         selectedAddress = "";
         selectedPosition = null;
-        reverseLookupSequence++;
+        const openSequence = ++reverseLookupSequence;
         confirmButton.disabled = true;
         addressOutput.textContent = "Search for an address or tap anywhere on the map.";
         hint.textContent = "You can drag the pin to adjust the exact entrance.";
@@ -263,6 +410,7 @@
 
         try {
             await loadMaps();
+            if (openSequence !== reverseLookupSequence || !modal.classList.contains("is-open")) return;
             initializeMap();
             setBusy(false);
 
@@ -271,7 +419,9 @@
             if (activeLatitudeInput.value && activeLongitudeInput.value &&
                 Number.isFinite(latitude) && Number.isFinite(longitude)) {
                 map.setZoom(17);
-                void choosePosition({ lat: latitude, lng: longitude });
+                selectedAddress = cleanAddress(activeAddressInput.value);
+                addressOutput.textContent = selectedAddress;
+                void choosePosition({ lat: latitude, lng: longitude }, !selectedAddress);
             } else {
                 map.setCenter(defaultCenter);
                 map.setZoom(13);
@@ -280,6 +430,7 @@
                 accuracyCircle?.setMap(null);
                 accuracyCircle = null;
             }
+            searchStatus.textContent = "Type a place name to see matches, or choose a recent location.";
         } catch {
             showError("Google Maps could not load. Check the API key and Maps JavaScript API settings.");
         }
@@ -292,15 +443,44 @@
 
     searchButton.addEventListener("click", findAddress);
     currentButton.addEventListener("click", useCurrentLocation);
+    search.addEventListener("focus", () => {
+        const recent = recentLocations().map(x => ({ label: x.address, position: { lat: x.lat, lng: x.lng }, recent: true }));
+        renderSuggestions(recent);
+    });
+    search.addEventListener("input", () => {
+        stopGps();
+        ++searchSequence;
+        ++reverseLookupSequence;
+        setBusy(false);
+        confirmButton.disabled = true;
+        hideSuggestions();
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(findAddress, 300);
+    });
     search.addEventListener("keydown", event => {
+        if ((event.key === "ArrowDown" || event.key === "ArrowUp") && !suggestions.hidden && rows.length) {
+            event.preventDefault();
+            activeRow = (activeRow + (event.key === "ArrowDown" ? 1 : -1) + rows.length) % rows.length;
+            Array.from(suggestions.children).forEach((button, index) => button.setAttribute("aria-selected", String(index === activeRow)));
+            search.setAttribute("aria-activedescendant", `location-option-${activeRow}`);
+            suggestions.children[activeRow].scrollIntoView({ block: "nearest" });
+        }
         if (event.key === "Enter") {
             event.preventDefault();
-            findAddress();
+            clearTimeout(searchTimer);
+            if (activeRow >= 0 && !suggestions.hidden) void selectSuggestion(rows[activeRow]);
+            else void findAddress();
         }
     });
 
     confirmButton.addEventListener("click", () => {
-        if (!selectedPosition) return;
+        if (!selectedPosition || confirmButton.disabled) return;
+        if (historyKey) {
+            try {
+                const previous = recentLocations().filter(x => Math.abs(x.lat - selectedPosition.lat) > .00005 || Math.abs(x.lng - selectedPosition.lng) > .00005);
+                localStorage.setItem(historyKey, JSON.stringify([{ ...selectedPosition, address: selectedAddress }, ...previous].slice(0, 6)));
+            } catch { /* Location selection works even when browser storage is unavailable. */ }
+        }
         activeAddressInput.value = selectedAddress || formattedCoordinates(selectedPosition);
         activeLatitudeInput.value = selectedPosition.lat.toFixed(6);
         activeLongitudeInput.value = selectedPosition.lng.toFixed(6);
