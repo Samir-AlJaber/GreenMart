@@ -2,520 +2,274 @@
 
 @{
     ViewData["Title"] = "Checkout";
+    var total = Model.CartItems.Sum(x => x.Product.Price * x.Quantity);
 }
 
-
-
 <section class="checkout-page">
-
-
     <div class="checkout-header">
-
-        <h1>
-            Checkout
-        </h1>
-
-        <p>
-            Complete your order details before placing your order.
-        </p>
-
+        <span class="checkout-eyebrow">Secure checkout</span>
+        <h1>Complete your order</h1>
+        <p>Confirm your delivery location, then choose how you would like to pay.</p>
     </div>
-
-
 
     <div class="checkout-container">
-
-
-        <div class="checkout-details">
-
-
-            <h2>
-                Delivery Information
-            </h2>
-
-
-            <div class="checkout-field">
-
-                <label>
-                    Full Name
-                </label>
-
-                <input type="text"
-                       value="@Model.User.FullName"
-                       readonly />
-
-            </div>
-
-
-
-            <div class="checkout-field">
-
-                <label>
-                    Phone Number
-                </label>
-
-                <input type="text"
-                   name="PhoneNumber"
-                   id="phoneNumber"
-                   value="@Model.User.PhoneNumber"
-                   maxlength="11"
-                   inputmode="numeric"
-                   autocomplete="tel"
-                   required />
-
-                   <p id="phoneError"
-                       class="checkout-error">
-                    </p>
-
-            </div>
-
-
-
-            <div class="checkout-field">
-
-                <label>
-                    Shipping Address
-                </label>
-
-                <textarea name="ShippingAddress"
-                          id="shippingAddress"
-                          rows="4"
-                          required>@Model.User.Address</textarea>
-
-                <input type="hidden" name="ShippingLatitude" id="shippingLatitude" />
-                <input type="hidden" name="ShippingLongitude" id="shippingLongitude" />
-
-                <button type="button"
-                        class="location-picker-trigger js-location-picker"
-                        data-address-target="#shippingAddress"
-                        data-latitude-target="#shippingLatitude"
-                        data-longitude-target="#shippingLongitude"
-                        data-picker-title="Choose delivery location">
-                    Set exact location on map
-                </button>
-
-                         <p id="addressError"
-                           class="checkout-error">
-                        </p>
-
-            </div>
-
-
-
-        </div>
-
-
-
-
-        <div class="checkout-summary">
-
-
-            <h2>
-                Order Summary
-            </h2>
-
-
-
-            @foreach (var item in Model.CartItems)
-            {
-
-
-                <div class="checkout-product">
-
-
-                    <span>
-                        @item.Product.ProductName
-                        ×
-                        @item.Quantity
-                    </span>
-
-
-                    <strong>
-                        ৳@(item.Product.Price * item.Quantity)
-                    </strong>
-
-
+        <div class="checkout-main-column">
+            <div class="checkout-details">
+                <div class="checkout-section-heading">
+                    <span>1</span>
+                    <div><h2>Delivery information</h2><p>Used by the seller and delivery partner for this order.</p></div>
                 </div>
 
+                <div class="checkout-field">
+                    <label for="fullName">Full name</label>
+                    <input id="fullName" type="text" value="@Model.User.FullName" readonly />
+                </div>
 
-            }
+                <div class="checkout-field">
+                    <label for="phoneNumber">Phone number</label>
+                    <input type="text" id="phoneNumber" value="@Model.User.PhoneNumber"
+                           maxlength="11" inputmode="numeric" autocomplete="tel" required />
+                    <p id="phoneError" class="checkout-error"></p>
+                </div>
 
-
-
-            <div class="checkout-total">
-
-
-                <span>
-                    Total
-                </span>
-
-
-                <strong>
-
-                    ৳@Model.CartItems.Sum(
-                        x =>
-                        x.Product.Price *
-                        x.Quantity
-                    )
-
-                </strong>
-
-
+                <div class="checkout-field">
+                    <label for="shippingAddress">Shipping address</label>
+                    <textarea id="shippingAddress" rows="4" required>@Model.User.Address</textarea>
+                    <input type="hidden" id="shippingLatitude" />
+                    <input type="hidden" id="shippingLongitude" />
+                    <button type="button" class="location-picker-trigger js-location-picker"
+                            data-address-target="#shippingAddress"
+                            data-latitude-target="#shippingLatitude"
+                            data-longitude-target="#shippingLongitude"
+                            data-picker-title="Choose delivery location">
+                        Set exact location on map
+                    </button>
+                    <p id="addressError" class="checkout-error"></p>
+                </div>
             </div>
 
+            <div class="checkout-payment">
+                <div class="checkout-section-heading">
+                    <span>2</span>
+                    <div><h2>Payment method</h2><p>Online payments open in SSLCOMMERZ's secure hosted checkout.</p></div>
+                </div>
 
+                <div class="payment-options" role="radiogroup" aria-label="Payment method">
+                    <label class="payment-option is-selected">
+                        <input type="radio" name="paymentOption" value="cod" checked />
+                        <span class="payment-option-icon cod-icon" aria-hidden="true">৳</span>
+                        <span class="payment-option-copy">
+                            <strong>Cash on Delivery</strong>
+                            <small>Pay the delivery partner when you receive your order.</small>
+                        </span>
+                        <span class="payment-option-check" aria-hidden="true"></span>
+                    </label>
 
-            <button type="button"
-                    id="placeOrderBtn"
-                    class="place-order-btn">
-
-                Place Order
-
-            </button>
-
-
-
+                    <div class="online-payment-block">
+                        <div class="online-payment-heading">
+                            <strong>Pay online</strong>
+                            <span>Processed securely by SSLCOMMERZ</span>
+                        </div>
+                        <div class="payment-brand-grid">
+                            <label class="payment-brand-card payment-brand-bkash">
+                                <input type="radio" name="paymentOption" value="bkash" />
+                                <span class="payment-brand-name">bKash</span><small>Mobile banking</small>
+                            </label>
+                            <label class="payment-brand-card payment-brand-nagad">
+                                <input type="radio" name="paymentOption" value="nagad" />
+                                <span class="payment-brand-name">Nagad</span><small>Mobile banking</small>
+                            </label>
+                            <label class="payment-brand-card payment-brand-rocket">
+                                <input type="radio" name="paymentOption" value="rocket" />
+                                <span class="payment-brand-name">Rocket</span><small>Mobile banking</small>
+                            </label>
+                            <label class="payment-brand-card payment-brand-visa">
+                                <input type="radio" name="paymentOption" value="visa" />
+                                <span class="payment-brand-name">VISA</span><small>Debit or credit card</small>
+                            </label>
+                            <label class="payment-brand-card payment-brand-mastercard">
+                                <input type="radio" name="paymentOption" value="mastercard" />
+                                <span class="payment-brand-name"><i></i><b></b>mastercard</span><small>Debit or credit card</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <p id="paymentError" class="checkout-error"></p>
+                <p class="payment-security-note">GreenMart never receives or stores your card, PIN, OTP, or mobile-banking password.</p>
+            </div>
         </div>
 
-
+        <aside class="checkout-summary">
+            <h2>Order summary</h2>
+            <div class="checkout-product-list">
+                @foreach (var item in Model.CartItems)
+                {
+                    <div class="checkout-product">
+                        <span>@item.Product.ProductName <small>× @item.Quantity</small></span>
+                        <strong>৳@((item.Product.Price * item.Quantity).ToString("0.00"))</strong>
+                    </div>
+                }
+            </div>
+            <div class="checkout-summary-line"><span>Subtotal</span><span>৳@total.ToString("0.00")</span></div>
+            <div class="checkout-summary-line"><span>Delivery fee</span><span>Set by delivery</span></div>
+            <div class="checkout-total"><span>Total</span><strong>৳@total.ToString("0.00")</strong></div>
+            <button type="button" id="placeOrderBtn" class="place-order-btn">Place Cash on Delivery order</button>
+            <p class="checkout-terms">By continuing, you confirm that the order and delivery details are correct.</p>
+        </aside>
     </div>
-
-
 </section>
 
-<div class="order-place-overlay"
-     id="placeOrderOverlay"
-     style="display:none;">
-
-
+<div class="order-place-overlay" id="placeOrderOverlay" style="display:none;">
     <div class="order-place-box">
-
-
-        <h3>
-            Confirm Order
-        </h3>
-
-
-        <p>
-            Are you sure you want to place this order?
-        </p>
-
-
-
+        <h3 id="confirmationTitle">Confirm order</h3>
+        <p id="confirmationMessage">Are you sure you want to place this order?</p>
         <div class="order-place-buttons">
-
-
-            <button type="button"
-                    id="cancelPlaceOrder">
-
-                Cancel
-
-            </button>
-
-
-
-            <button type="button"
-                    id="confirmPlaceOrder">
-
-                Confirm Order
-
-            </button>
-
-
+            <button type="button" id="cancelPlaceOrder">Go back</button>
+            <button type="button" id="confirmPlaceOrder">Confirm order</button>
         </div>
-
-
     </div>
-
-
 </div>
 
 <partial name="_LocationPicker" />
 
-
-
-<div class="order-success-message"
-     id="orderSuccessMessage"
-     style="display:none;">
-
+<div class="order-success-message" id="orderSuccessMessage" style="display:none;">
     <strong>Order placed successfully</strong>
-    <span>Your PDF receipt is ready to save or show to the delivery partner.</span>
+    <span>Your Cash on Delivery order and PDF receipt are ready.</span>
     <div class="order-success-actions">
         <a id="downloadOrderReceipt" href="#">Download PDF receipt</a>
-        <a asp-controller="Order" asp-action="MyOrders" class="success-orders-link">View My Orders</a>
+        <a asp-controller="Order" asp-action="MyOrders" class="success-orders-link">View my orders</a>
     </div>
-
 </div>
 
 <script>
-
-            document
-            .getElementById("phoneNumber")
-            .addEventListener(
-                "input",
-                function ()
-                {
-
-                    this.value =
-                        this.value.replace(
-                            /[^0-9]/g,
-                            ""
-                        );
-
-                }
-            );
-
-</script>
-
-<script>
-
-                document
-                .getElementById("placeOrderBtn")
-                .addEventListener(
-                    "click",
-                    function ()
-                    {
-
-
-                        let phone =
-                            document
-                            .getElementById("phoneNumber")
-                            .value;
-
-
-                        let address =
-                            document
-                            .querySelector(
-                                "textarea[name='ShippingAddress']"
-                            )
-                            .value;
-
-                        let latitude = document.getElementById("shippingLatitude").value;
-                        let longitude = document.getElementById("shippingLongitude").value;
-
-
-
-                        document
-                            .getElementById("phoneError")
-                            .innerHTML = "";
-
-                            document
-                            .getElementById("phoneError")
-                            .classList.remove("show");
-
-
-                            document
-                            .getElementById("addressError")
-                            .innerHTML = "";
-
-                            document
-                            .getElementById("addressError")
-                            .classList.remove("show");
-
-
-                        fetch(
-                              "/Checkout/ValidateOrder",
-                            {
-
-                                method: "POST",
-
-                                headers:
-                                {
-                                    "Content-Type":
-                                    "application/x-www-form-urlencoded"
-                                },
-
-
-                                body:
-                                `PhoneNumber=${encodeURIComponent(phone)}&ShippingAddress=${encodeURIComponent(address)}&ShippingLatitude=${encodeURIComponent(latitude)}&ShippingLongitude=${encodeURIComponent(longitude)}`
-
-                            }
-                        )
-
-                        .then(
-                            response =>
-                            response.json()
-                        )
-
-
-                        .then(
-                            data =>
-                            {
-
-
-                                if(data.success)
-                                {
-
-                                    document
-                                    .getElementById("placeOrderOverlay")
-                                    .style.display = "flex";
-
-
-                                }
-                                else
-                                {
-
-
-                                    if(data.phoneError)
-{
-
-                                        document
-                                        .getElementById("phoneError")
-                                        .innerHTML =
-                                        data.phoneError;
-
-
-                                        document
-                                        .getElementById("phoneError")
-                                        .classList.add("show");
-
-                                    }
-
-
-
-                                    if(data.addressError)
-                                    {
-
-                                        document
-                                        .getElementById("addressError")
-                                        .innerHTML =
-                                        data.addressError;
-
-
-                                        document
-                                        .getElementById("addressError")
-                                        .classList.add("show");
-
-                                    }
-
-
-                                }
-
-
-                            }
-                        );
-
-
-                    }
-
-                );
-
-</script>
-
-<script>
-                                document
-                                    .getElementById("cancelPlaceOrder")
-                                    .addEventListener(
-                                        "click",
-                                        function()
-                                        {
-
-                                            document
-                                            .getElementById("placeOrderOverlay")
-                                            .style.display = "none";
-
-                                        }
-                                    );
-
-
-
-                                    document
-.getElementById("confirmPlaceOrder")
-.addEventListener(
-    "click",
-    function()
-    {
-
-        let phone =
-            document
-            .getElementById("phoneNumber")
-            .value;
-
-
-        let address =
-            document
-            .querySelector(
-                "textarea[name='ShippingAddress']"
-            )
-            .value;
-
-        let latitude = document.getElementById("shippingLatitude").value;
-        let longitude = document.getElementById("shippingLongitude").value;
-
-
-
-        fetch(
-            "/Checkout/PlaceOrder",
-            {
-
-                method: "POST",
-
-                headers:
-                {
-                    "Content-Type":
-                    "application/x-www-form-urlencoded"
-                },
-
-
-                body:
-                `PhoneNumber=${encodeURIComponent(phone)}&ShippingAddress=${encodeURIComponent(address)}&ShippingLatitude=${encodeURIComponent(latitude)}&ShippingLongitude=${encodeURIComponent(longitude)}`
-
-            }
-        )
-
-        .then(
-            response =>
-            response.json()
-        )
-
-
-        .then(
-            data =>
-            {
-
-                if(data.success)
-                {
-
-                    document
-                    .getElementById("placeOrderOverlay")
-                    .style.display = "none";
-
-
-
-                    document
-                    .getElementById("orderSuccessMessage")
-                    .style.display = "grid";
-
-                    document
-                    .getElementById("downloadOrderReceipt")
-                    .href =
-                    `/Order/DownloadReceipt?orderId=${data.orderId}`;
-
-                    fetch("/Cart/CartCount")
-                        .then(response => response.json())
-                        .then(data =>
-                    {
-
-                        let badge =
-                            document.getElementById("cartCountBadge");
-
-
-                        if(badge)
-                        {
-                            badge.innerHTML = data.count;
-                        }
-
-                    });
-
-                }
-
-
-            }
-
-        );
-
-
+(() => {
+    const phoneInput = document.getElementById("phoneNumber");
+    const placeButton = document.getElementById("placeOrderBtn");
+    const confirmButton = document.getElementById("confirmPlaceOrder");
+    const overlay = document.getElementById("placeOrderOverlay");
+    const optionInputs = [...document.querySelectorAll('input[name="paymentOption"]')];
+
+    phoneInput.addEventListener("input", () => {
+        phoneInput.value = phoneInput.value.replace(/[^0-9]/g, "");
+    });
+
+    function selectedPayment() {
+        const channel = optionInputs.find(input => input.checked)?.value || "cod";
+        return {
+            method: channel === "cod" ? "CashOnDelivery" : "Online",
+            channel: channel === "cod" ? "" : channel
+        };
     }
-);
 
+    function checkoutBody() {
+        const payment = selectedPayment();
+        return new URLSearchParams({
+            PhoneNumber: phoneInput.value,
+            ShippingAddress: document.getElementById("shippingAddress").value,
+            ShippingLatitude: document.getElementById("shippingLatitude").value,
+            ShippingLongitude: document.getElementById("shippingLongitude").value,
+            PaymentMethod: payment.method,
+            PaymentChannel: payment.channel
+        });
+    }
+
+    function clearErrors() {
+        ["phoneError", "addressError", "paymentError"].forEach(id => {
+            const element = document.getElementById(id);
+            element.textContent = "";
+            element.classList.remove("show");
+        });
+    }
+
+    function showErrors(data) {
+        const errors = {
+            phoneError: data.phoneError,
+            addressError: data.addressError,
+            paymentError: data.paymentError || data.message
+        };
+        Object.entries(errors).forEach(([id, message]) => {
+            if (!message) return;
+            const element = document.getElementById(id);
+            element.textContent = message;
+            element.classList.add("show");
+        });
+    }
+
+    function refreshPaymentUi() {
+        const payment = selectedPayment();
+        document.querySelectorAll(".payment-option, .payment-brand-card").forEach(card => card.classList.remove("is-selected"));
+        optionInputs.find(input => input.checked)?.closest("label")?.classList.add("is-selected");
+        placeButton.textContent = payment.method === "CashOnDelivery"
+            ? "Place Cash on Delivery order"
+            : "Continue to secure payment";
+    }
+
+    optionInputs.forEach(input => input.addEventListener("change", refreshPaymentUi));
+
+    placeButton.addEventListener("click", async () => {
+        clearErrors();
+        placeButton.disabled = true;
+        try {
+            const response = await fetch("/Checkout/ValidateOrder", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: checkoutBody()
+            });
+            const data = await response.json();
+            if (!data.success) return showErrors(data);
+
+            const payment = selectedPayment();
+            document.getElementById("confirmationTitle").textContent =
+                payment.method === "CashOnDelivery" ? "Confirm Cash on Delivery" : "Continue to secure payment";
+            document.getElementById("confirmationMessage").textContent =
+                payment.method === "CashOnDelivery"
+                    ? "Your order will be placed now and you will pay when it arrives."
+                    : "You will be redirected to SSLCOMMERZ to complete payment securely.";
+            confirmButton.textContent = payment.method === "CashOnDelivery" ? "Place order" : "Continue";
+            overlay.style.display = "flex";
+        } catch {
+            showErrors({ message: "Could not validate the order. Please try again." });
+        } finally {
+            placeButton.disabled = false;
+        }
+    });
+
+    document.getElementById("cancelPlaceOrder").addEventListener("click", () => overlay.style.display = "none");
+
+    confirmButton.addEventListener("click", async () => {
+        clearErrors();
+        confirmButton.disabled = true;
+        confirmButton.textContent = "Please wait…";
+        try {
+            const response = await fetch("/Checkout/PlaceOrder", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: checkoutBody()
+            });
+            const data = await response.json();
+            if (!data.success) {
+                overlay.style.display = "none";
+                return showErrors(data);
+            }
+            if (data.redirectUrl) {
+                window.location.assign(data.redirectUrl);
+                return;
+            }
+
+            overlay.style.display = "none";
+            document.getElementById("orderSuccessMessage").style.display = "grid";
+            document.getElementById("downloadOrderReceipt").href = `/Order/DownloadReceipt?orderId=${data.orderId}`;
+            const badge = document.getElementById("cartCountBadge");
+            if (badge) badge.textContent = "0";
+        } catch {
+            overlay.style.display = "none";
+            showErrors({ message: "The order could not be placed. Please try again." });
+        } finally {
+            confirmButton.disabled = false;
+            refreshPaymentUi();
+        }
+    });
+
+    refreshPaymentUi();
+})();
 </script>
