@@ -28,6 +28,14 @@ namespace GreenMart.Models
         [Required]
         public string Status { get; set; } = "Pending";
 
+        [Required]
+        [MaxLength(30)]
+        public string PaymentMethod { get; set; } = "CashOnDelivery";
+
+        [Required]
+        [MaxLength(30)]
+        public string PaymentStatus { get; set; } = "CashOnDelivery";
+
 
 
         public string? ShippingAddress { get; set; }
@@ -51,6 +59,8 @@ namespace GreenMart.Models
 
 
         public ICollection<OrderItem>? OrderItems { get; set; }
+
+        public Payment? Payment { get; set; }
 
     }
 }
