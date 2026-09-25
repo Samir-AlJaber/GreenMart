@@ -1,0 +1,116 @@
+@model GreenMart.Models.SellerWalletViewModel
+
+@{
+    ViewData["Title"] = "Seller wallet";
+}
+
+<section class="role-dashboard seller-wallet-page">
+    <div class="role-dashboard-shell">
+        <header class="role-dashboard-header">
+            <div>
+                <span class="role-eyebrow">Seller payouts</span>
+                <h1>Your GreenMart wallet</h1>
+                <p>Track earnings from delivered orders and choose where GreenMart should send your payouts.</p>
+            </div>
+            <div class="wallet-account-status">
+                <span>Payout account</span>
+                <strong>@(Model.Account?.Status ?? "Not added")</strong>
+            </div>
+        </header>
+
+        @if (TempData["PayoutMessage"] != null)
+        {
+            <div class="role-notice">@TempData["PayoutMessage"]</div>
+        }
+
+        <div class="wallet-balance-grid">
+            <article><span>Pending</span><strong>৳@Model.PendingBalance.ToString("0.00")</strong><small>Delivery, remittance or release checks</small></article>
+            <article><span>Ready for payout</span><strong>৳@Model.AvailableBalance.ToString("0.00")</strong><small>Waiting for provider or admin transfer</small></article>
+            <article><span>Total paid</span><strong>৳@Model.PaidBalance.ToString("0.00")</strong><small>Successfully transferred to you</small></article>
+        </div>
+
+        <div class="wallet-layout">
+            <section class="wallet-panel">
+                <div class="wallet-panel-heading">
+                    <div><span class="role-eyebrow">Payout destination</span><h2>@(Model.Account == null ? "Add an account" : "Update your account")</h2></div>
+                    @if (Model.Account != null)
+                    {
+                        <span class="wallet-status wallet-status-@Model.Account.Status.ToLowerInvariant()">@Model.Account.Status</span>
+                    }
+                </div>
+
+                <form asp-action="SaveAccount" method="post" class="payout-account-form" id="payoutAccountForm">
+                    @Html.AntiForgeryToken()
+                    <label>
+                        <span>Payout method</span>
+                        <select name="method" id="payoutMethod">
+                            @if (Model.Account?.Method == "Bank")
+                            {
+                                <option value="Bkash">bKash</option>
+                                <option value="Bank" selected>Bank account</option>
+                            }
+                            else
+                            {
+                                <option value="Bkash" selected>bKash</option>
+                                <option value="Bank">Bank account</option>
+                            }
+                        </select>
+                    </label>
+                    <label>
+                        <span>Account holder name</span>
+                        <input name="accountHolderName" value="@Model.Account?.AccountHolderName" maxlength="120" required />
+                    </label>
+                    <label>
+                        <span>Account number</span>
+                        <input name="accountNumber" value="@Model.Account?.AccountNumber" maxlength="40" inputmode="numeric" required />
+                    </label>
+                    <div class="bank-payout-fields" id="bankPayoutFields">
+                        <label><span>Bank name</span><input name="bankName" value="@Model.Account?.BankName" maxlength="120" /></label>
+                        <label><span>Branch name</span><input name="branchName" value="@Model.Account?.BranchName" maxlength="120" /></label>
+                        <label><span>Routing number</span><input name="routingNumber" value="@Model.Account?.RoutingNumber" maxlength="30" /></label>
+                    </div>
+                    <p class="wallet-security-note">GreenMart will never ask for your bKash PIN, bank password or OTP. Updating these details requires admin verification again.</p>
+                    <button type="submit">Save payout account</button>
+                </form>
+            </section>
+
+            <section class="wallet-panel">
+                <div class="wallet-panel-heading"><div><span class="role-eyebrow">Transactions</span><h2>Earning history</h2></div></div>
+                @if (!Model.Earnings.Any())
+                {
+                    <div class="wallet-empty"><strong>No earnings yet</strong><span>Delivered seller orders will appear here automatically.</span></div>
+                }
+                else
+                {
+                    <div class="wallet-transaction-list">
+                        @foreach (var earning in Model.Earnings)
+                        {
+                            <article class="wallet-transaction">
+                                <div><strong>Order #@earning.OrderId</strong><span>@earning.CreatedAt.ToString("dd MMM yyyy, h:mm tt") · @earning.PaymentMethod</span></div>
+                                <div class="wallet-transaction-amount"><strong>৳@earning.NetAmount.ToString("0.00")</strong><span>@earning.Status</span></div>
+                                @if (!string.IsNullOrWhiteSpace(earning.StatusNote))
+                                {
+                                    <p>@earning.StatusNote</p>
+                                }
+                                @if (earning.Payout?.ExternalReference != null)
+                                {
+                                    <small>Transaction reference: @earning.Payout.ExternalReference</small>
+                                }
+                            </article>
+                        }
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+</section>
+
+<script>
+(() => {
+    const method = document.getElementById("payoutMethod");
+    const fields = document.getElementById("bankPayoutFields");
+    const refresh = () => fields.hidden = method.value !== "Bank";
+    method.addEventListener("change", refresh);
+    refresh();
+})();
+</script>
