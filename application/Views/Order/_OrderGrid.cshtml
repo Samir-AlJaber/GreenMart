@@ -193,6 +193,9 @@ else
                 </div>
 
                 @if (product.OrderStatus != "Rejected" &&
+                     product.OrderStatus != "PaymentPending" &&
+                     product.OrderStatus != "PaymentFailed" &&
+                     product.OrderStatus != "PaymentCancelled" &&
                      receiptOrderIds.Add(product.OrderId))
                 {
                     <a asp-controller="Order"
