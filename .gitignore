@@ -6,6 +6,8 @@ application/bin/
 application/obj/
 application/appsettings.json
 application/appsettings.Maps.json
+application/appsettings.Payment.json
+application/appsettings.Payout.json
 
 # Visual Studio user-specific files
 *.user
