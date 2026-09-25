@@ -41,6 +41,14 @@ namespace GreenMart.Data
 
         public DbSet<OrderItem> OrderItems { get; set; }
 
+        public DbSet<Payment> Payments { get; set; }
+
+        public DbSet<SellerPayoutAccount> SellerPayoutAccounts { get; set; }
+
+        public DbSet<SellerEarning> SellerEarnings { get; set; }
+
+        public DbSet<SellerPayout> SellerPayouts { get; set; }
+
 
 
         public DbSet<Review> Reviews { get; set; }
@@ -56,6 +64,48 @@ namespace GreenMart.Data
 
 
         public DbSet<DeliveryRating> DeliveryRatings { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Payment>()
+                .HasIndex(x => x.TransactionId)
+                .IsUnique();
+
+            modelBuilder.Entity<Payment>()
+                .HasIndex(x => x.OrderId)
+                .IsUnique();
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(x => x.Order)
+                .WithOne(x => x.Payment)
+                .HasForeignKey<Payment>(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SellerPayoutAccount>()
+                .HasIndex(x => x.SellerId)
+                .IsUnique();
+
+            modelBuilder.Entity<SellerEarning>()
+                .HasIndex(x => x.DeliveryAssignmentId)
+                .IsUnique();
+
+            modelBuilder.Entity<SellerPayout>()
+                .HasIndex(x => x.SellerEarningId)
+                .IsUnique();
+
+            modelBuilder.Entity<SellerPayout>()
+                .HasIndex(x => x.ExternalReference)
+                .IsUnique()
+                .HasFilter("[ExternalReference] IS NOT NULL");
+
+            modelBuilder.Entity<SellerPayout>()
+                .HasOne(x => x.Earning)
+                .WithOne(x => x.Payout)
+                .HasForeignKey<SellerPayout>(x => x.SellerEarningId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
 
     }
 }
