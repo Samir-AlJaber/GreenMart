@@ -480,3 +480,70 @@
         flex-direction: column;
     }
 }
+
+/* Payment choice and result */
+.checkout-eyebrow { display:inline-block; margin-bottom:7px; color:#177253; font-size:12px; font-weight:850; letter-spacing:.13em; text-transform:uppercase; }
+.checkout-main-column { display:grid; gap:24px; }
+.checkout-payment { background:rgba(255,255,255,.88); backdrop-filter:blur(12px); border:1px solid #bbf7d0; border-radius:26px; padding:32px; box-shadow:0 20px 45px rgba(16,185,129,.12); }
+.checkout-summary { position:sticky; top:104px; align-self:start; }
+.checkout-section-heading { display:flex; align-items:flex-start; gap:13px; margin-bottom:26px; }
+.checkout-section-heading>span { display:grid; place-items:center; flex:0 0 30px; width:30px; height:30px; border-radius:50%; background:#dff5e9; color:#086143; font-size:13px; font-weight:850; }
+.checkout-section-heading h2 { margin:1px 0 3px; color:#065f46; font-size:25px; font-weight:800; }
+.checkout-section-heading p,.online-payment-heading span { margin:0; color:#6b7e74; font-size:12px; }
+.payment-options { display:grid; gap:14px; }
+.payment-option { display:flex; align-items:center; gap:14px; padding:16px; border:1px solid #d7e4dc; border-radius:16px; background:#fff; cursor:pointer; transition:.2s ease; }
+.payment-option:hover,.payment-option.is-selected,.payment-brand-card:hover,.payment-brand-card.is-selected { border-color:#16825c; box-shadow:0 0 0 3px rgba(22,130,92,.1); }
+.payment-option input,.payment-brand-card input { position:absolute; opacity:0; pointer-events:none; }
+.payment-option-icon { display:grid; place-items:center; width:43px; height:43px; flex:0 0 43px; border-radius:13px; background:#e9f7ef; color:#08704b; font-size:22px; font-weight:850; }
+.payment-option-copy { display:grid; flex:1; gap:2px; }
+.payment-option-copy strong,.online-payment-heading strong { color:#123f30; font-size:14px; }
+.payment-option-copy small,.payment-brand-card small { color:#6b7e74; font-size:11px; }
+.payment-option-check { width:19px; height:19px; border:2px solid #b8c8bf; border-radius:50%; box-shadow:inset 0 0 0 4px #fff; }
+.payment-option.is-selected .payment-option-check { border-color:#16825c; background:#16825c; }
+.online-payment-block { padding:17px; border:1px solid #d7e4dc; border-radius:16px; background:linear-gradient(145deg,#fbfdfb,#f4faf6); }
+.online-payment-heading { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:13px; }
+.payment-brand-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+.payment-brand-card { display:grid; min-height:76px; align-content:center; gap:3px; padding:11px; border:1px solid #dae5df; border-radius:12px; background:#fff; cursor:pointer; transition:.2s ease; }
+.payment-brand-name { color:#183f32; font-size:16px; font-weight:900; letter-spacing:-.02em; }
+.payment-brand-bkash .payment-brand-name { color:#d91a5b; }
+.payment-brand-nagad .payment-brand-name { color:#e85c13; }
+.payment-brand-rocket .payment-brand-name { color:#762b8a; }
+.payment-brand-visa .payment-brand-name { color:#173c96; font-style:italic; letter-spacing:.05em; }
+.payment-brand-mastercard .payment-brand-name { font-size:12px; }
+.payment-brand-mastercard i,.payment-brand-mastercard b { display:inline-block; width:17px; height:17px; margin-right:-6px; border-radius:50%; background:#ea001b; vertical-align:-4px; opacity:.9; }
+.payment-brand-mastercard b { margin-right:5px; background:#f79e1b; }
+.payment-security-note,.checkout-terms { margin:14px 0 0; color:#65796e; font-size:11px; line-height:1.55; }
+.checkout-product-list { max-height:320px; overflow:auto; padding-right:3px; }
+.checkout-product small { color:#738079; font-weight:650; }
+.checkout-summary-line { display:flex; justify-content:space-between; gap:15px; margin-top:12px; color:#60746a; font-size:13px; }
+.place-order-btn:disabled,#confirmPlaceOrder:disabled { cursor:wait; opacity:.65; transform:none; }
+
+.payment-result-page { display:grid; min-height:68vh; place-items:center; padding:48px 20px; }
+.payment-result-card { width:min(590px,100%); padding:clamp(28px,5vw,48px); border:1px solid #d8e5dd; border-radius:28px; background:rgba(255,255,255,.93); box-shadow:0 24px 65px rgba(16,70,50,.13); text-align:center; }
+.payment-result-mark { display:grid; width:62px; height:62px; margin:0 auto 18px; place-items:center; border-radius:50%; background:#dff7e9; color:#08704b; font-size:29px; font-weight:900; }
+.payment-result-card.is-unsuccessful .payment-result-mark { background:#fff1e8; color:#bf4f15; }
+.payment-result-eyebrow { margin:0 0 5px; color:#16825c; font-size:12px; font-weight:850; letter-spacing:.11em; text-transform:uppercase; }
+.payment-result-card h1 { margin:0; color:#103e2f; font-size:clamp(28px,5vw,40px); }
+.payment-result-message { margin:12px auto 25px; max-width:440px; color:#63766c; line-height:1.6; }
+.payment-result-details { display:grid; grid-template-columns:repeat(3,1fr); margin:0 0 26px; border:1px solid #e0e9e3; border-radius:15px; overflow:hidden; }
+.payment-result-details div { padding:14px; background:#f8fbf9; }
+.payment-result-details div+div { border-left:1px solid #e0e9e3; }
+.payment-result-details dt { color:#718079; font-size:10px; text-transform:uppercase; letter-spacing:.08em; }
+.payment-result-details dd { margin:4px 0 0; color:#183f32; font-size:13px; font-weight:800; text-transform:capitalize; }
+.payment-result-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:9px; }
+.payment-result-actions a { padding:11px 15px; border-radius:10px; font-size:12px; font-weight:800; text-decoration:none; }
+.payment-primary-action { background:#08704b; color:#fff; }
+.payment-secondary-action { border:1px solid #bfd2c6; background:#fff; color:#185a43; }
+
+@media(max-width:900px) {
+    .checkout-payment { padding:22px; border-radius:20px; }
+    .checkout-summary { position:static; }
+}
+
+@media(max-width:540px) {
+    .checkout-payment { padding:18px; }
+    .payment-brand-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .payment-result-details { grid-template-columns:1fr; }
+    .payment-result-details div+div { border-left:0; border-top:1px solid #e0e9e3; }
+    .payment-result-actions { display:grid; }
+}

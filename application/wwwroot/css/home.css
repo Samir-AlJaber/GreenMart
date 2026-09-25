@@ -284,11 +284,11 @@
 
 
 .categories-grid {
-    max-width: 1200px;
+    max-width: 1360px;
     margin: auto;
     display: grid;
-    grid-template-columns: repeat(6,1fr);
-    gap: 25px;
+    grid-template-columns: repeat(6,minmax(0,1fr));
+    gap: 18px;
 }
 
 
@@ -320,7 +320,7 @@
 
 .category-image {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 5 / 4;
     margin-bottom: 20px;
     overflow: hidden;
     background: #d1fae5;

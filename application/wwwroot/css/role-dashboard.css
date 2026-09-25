@@ -890,3 +890,90 @@
         margin-left: 25px;
     }
 }
+
+/* Seller wallet and payout administration */
+.wallet-account-status { display:grid; min-width:190px; gap:4px; padding:18px 20px; border:1px solid rgba(22,163,74,.16); border-radius:18px; background:#fff; }
+.wallet-account-status span { color:#64748b; font-size:11px; font-weight:750; text-transform:uppercase; }
+.wallet-account-status strong { color:#047857; font-size:15px; }
+.wallet-balance-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; margin-bottom:22px; }
+.wallet-balance-grid article { display:grid; gap:5px; padding:21px; border:1px solid rgba(22,163,74,.14); border-radius:19px; background:rgba(255,255,255,.93); box-shadow:0 14px 32px rgba(15,70,45,.06); }
+.wallet-balance-grid span { color:#45685a; font-size:12px; font-weight:800; }
+.wallet-balance-grid strong { color:#064e3b; font-size:27px; }
+.wallet-balance-grid small { color:#7a8d84; font-size:10px; }
+.wallet-layout { display:grid; grid-template-columns:minmax(280px,.78fr) minmax(0,1.22fr); align-items:start; gap:20px; }
+.wallet-panel,.admin-payout-section { padding:24px; border:1px solid rgba(22,163,74,.14); border-radius:22px; background:rgba(255,255,255,.94); box-shadow:0 16px 40px rgba(15,70,45,.07); }
+.wallet-panel-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:20px; }
+.wallet-panel-heading h2 { margin:5px 0 0; color:#123b2b; font-size:21px; }
+.wallet-status { padding:7px 10px; border-radius:999px; background:#fff7d6; color:#8a5a00; font-size:10px; font-weight:850; }
+.wallet-status-verified { background:#dcfce7; color:#047857; }
+.payout-account-form { display:grid; gap:14px; }
+.payout-account-form label,.bank-payout-fields label { display:grid; gap:6px; color:#315d4c; font-size:11px; font-weight:800; }
+.payout-account-form input,.payout-account-form select,.manual-payout-form input { width:100%; padding:11px 12px; border:1px solid #cbdcd2; border-radius:10px; background:#fff; color:#153e30; font:inherit; }
+.bank-payout-fields { display:grid; gap:14px; }
+.bank-payout-fields[hidden] { display:none; }
+.payout-account-form button,.admin-payout-card button { padding:11px 15px; border:0; border-radius:10px; background:#047857; color:#fff; font-weight:800; cursor:pointer; }
+.wallet-security-note { margin:0; padding:11px 12px; border-radius:10px; background:#f0fdf4; color:#527064; font-size:11px; line-height:1.55; }
+.wallet-transaction-list { display:grid; gap:10px; }
+.wallet-transaction { display:grid; grid-template-columns:1fr auto; gap:4px 12px; padding:14px; border:1px solid #dfebe4; border-radius:13px; background:#fbfdfb; }
+.wallet-transaction>div { display:grid; gap:3px; }
+.wallet-transaction strong { color:#163e31; font-size:13px; }
+.wallet-transaction span,.wallet-transaction p,.wallet-transaction small { color:#71837a; font-size:10px; }
+.wallet-transaction p,.wallet-transaction>small { grid-column:1/-1; margin:4px 0 0; }
+.wallet-transaction-amount { text-align:right; }
+.wallet-empty { display:grid; gap:5px; padding:28px 18px; border:1px dashed #bcd4c6; border-radius:14px; color:#315d4c; text-align:center; }
+.wallet-empty span { color:#71837a; font-size:12px; }
+.admin-dashboard-links { display:flex; flex-wrap:wrap; gap:9px; margin:-10px 0 24px; }
+.admin-dashboard-links a { padding:11px 15px; border-radius:11px; background:#047857; color:#fff; font-size:12px; font-weight:800; text-decoration:none; }
+.admin-payout-section { margin-bottom:20px; }
+.admin-payout-section>.section-heading-small { margin-bottom:15px; }
+.admin-payout-list { display:grid; gap:11px; }
+.admin-payout-card { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)) minmax(180px,.85fr); align-items:center; gap:14px; padding:15px; border:1px solid #deebe3; border-radius:14px; background:#fbfdfb; }
+.admin-payout-card>div { display:grid; gap:3px; min-width:0; }
+.admin-payout-card span { color:#75877e; font-size:9px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.admin-payout-card strong { overflow-wrap:anywhere; color:#173f31; font-size:12px; }
+.admin-payout-card small { overflow-wrap:anywhere; color:#71837a; font-size:10px; }
+.manual-payout-form { display:grid; gap:7px; }
+
+/* Administrator access management */
+.admin-management-layout { display:grid; grid-template-columns:minmax(300px,.82fr) minmax(0,1.18fr); align-items:start; gap:20px; }
+.admin-management-panel { padding:24px; border:1px solid rgba(22,163,74,.14); border-radius:22px; background:rgba(255,255,255,.94); box-shadow:0 16px 40px rgba(15,70,45,.07); }
+.admin-management-panel>.section-heading-small { margin-bottom:19px; }
+.admin-create-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.admin-create-form label { display:grid; align-content:start; gap:6px; color:#315d4c; font-size:11px; font-weight:800; }
+.admin-create-form label:nth-of-type(2),.admin-create-form label:nth-of-type(6),.admin-create-form>button,.admin-form-errors { grid-column:1/-1; }
+.admin-create-form input,.admin-remove-control input { width:100%; padding:11px 12px; border:1px solid #cbdcd2; border-radius:10px; background:#fff; color:#153e30; font:inherit; }
+.admin-create-form input:focus,.admin-remove-control input:focus { outline:3px solid rgba(22,163,74,.12); border-color:#16a34a; }
+.admin-create-form small { color:#71837a; font-size:9px; font-weight:600; line-height:1.45; }
+.admin-create-form button,.admin-remove-control button { padding:11px 15px; border:0; border-radius:10px; background:#047857; color:#fff; font-weight:800; cursor:pointer; }
+.admin-form-errors,.field-validation-error { color:#b42318; font-size:10px; }
+.admin-form-errors:empty,.field-validation-error:empty { display:none; }
+.admin-management-error { border-color:#fecaca; background:#fff1f2; color:#b42318; }
+.admin-account-list { display:grid; gap:11px; }
+.admin-account-card { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:12px; padding:14px; border:1px solid #deebe3; border-radius:14px; background:#fbfdfb; }
+.admin-account-identity { display:grid; gap:3px; min-width:0; }
+.admin-account-identity strong { color:#173f31; font-size:13px; }
+.admin-account-identity span,.admin-account-identity small { overflow-wrap:anywhere; color:#71837a; font-size:10px; }
+.admin-you-badge { padding:7px 10px; border-radius:999px; background:#dcfce7; color:#047857; font-size:10px; font-weight:850; }
+.admin-remove-control { position:relative; }
+.admin-remove-control summary { padding:8px 10px; border-radius:9px; background:#fff1f2; color:#b42318; font-size:10px; font-weight:800; cursor:pointer; list-style:none; }
+.admin-remove-control summary::-webkit-details-marker { display:none; }
+.admin-remove-control form { position:absolute; z-index:4; top:calc(100% + 8px); right:0; display:grid; gap:10px; width:245px; padding:14px; border:1px solid #fecaca; border-radius:13px; background:#fff; box-shadow:0 16px 35px rgba(77,15,15,.14); }
+.admin-remove-control label { display:grid; gap:5px; color:#6b3535; font-size:10px; font-weight:750; }
+.admin-remove-control button { background:#b42318; }
+
+@media(max-width:850px) {
+    .wallet-layout,.wallet-balance-grid { grid-template-columns:1fr; }
+    .admin-payout-card { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .admin-management-layout { grid-template-columns:1fr; }
+}
+
+@media(max-width:540px) {
+    .wallet-account-status { min-width:0; }
+    .wallet-panel,.admin-payout-section { padding:18px; }
+    .admin-payout-card { grid-template-columns:1fr; }
+    .admin-create-form { grid-template-columns:1fr; }
+    .admin-create-form label:nth-of-type(2),.admin-create-form label:nth-of-type(6),.admin-create-form>button,.admin-form-errors { grid-column:auto; }
+    .admin-account-card { grid-template-columns:auto minmax(0,1fr); align-items:start; }
+    .admin-you-badge,.admin-remove-control { grid-column:2; justify-self:start; }
+    .admin-remove-control form { right:auto; left:0; width:min(245px,calc(100vw - 70px)); }
+}
