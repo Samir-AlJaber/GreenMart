@@ -60,6 +60,8 @@ namespace GreenMart.Services
                 new("section", "ORDER DETAILS"),
                 new("normal", $"Order number: #{order.OrderId}"),
                 new("normal", $"Order status: {ReadableOrderStatus(order.Status)}"),
+                new("normal", $"Payment method: {ReadablePaymentMethod(order.PaymentMethod)}"),
+                new("normal", $"Payment status: {ReadablePaymentStatus(order.PaymentStatus)}"),
                 new("normal", $"Order date: {order.CreatedAt:dd MMM yyyy, hh:mm tt}"),
                 new("space", string.Empty),
                 new("section", "CUSTOMER AND DELIVERY"),
@@ -115,6 +117,9 @@ namespace GreenMart.Services
                 }
             }
 
+            // Keep the unassigned-delivery message visually separate from the
+            // following green section heading.
+            lines.Add(new("space", string.Empty));
             lines.Add(new("section", "RECEIPT VERIFICATION"));
             AddWrapped(
                 lines,
@@ -127,6 +132,19 @@ namespace GreenMart.Services
 
             return lines;
         }
+
+        private static string ReadablePaymentMethod(string method) => method switch
+        {
+            "CashOnDelivery" => "Cash on Delivery",
+            "Online" => "Online payment",
+            _ => method
+        };
+
+        private static string ReadablePaymentStatus(string status) => status switch
+        {
+            "CashOnDelivery" => "Pay on delivery",
+            _ => status
+        };
 
         private static byte[] BuildPdf(IReadOnlyList<List<ReceiptLine>> pages)
         {
