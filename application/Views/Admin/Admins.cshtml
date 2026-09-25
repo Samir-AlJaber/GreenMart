@@ -1,0 +1,144 @@
+@model GreenMart.Models.AdminManagementViewModel
+
+@{
+    ViewData["Title"] = "Manage Administrators";
+}
+
+<section class="role-dashboard">
+    <div class="role-dashboard-shell">
+        <header class="role-dashboard-header">
+            <div>
+                <span class="role-eyebrow">Access control</span>
+                <h1>Manage administrators</h1>
+                <p>Add trusted administrators and remove access when it is no longer needed.</p>
+            </div>
+
+            <div class="role-summary-card">
+                <strong>@Model.Administrators.Count</strong>
+                <span>active administrators</span>
+            </div>
+        </header>
+
+        <div class="admin-dashboard-links">
+            <a asp-action="Dashboard">Delivery approvals</a>
+            <a asp-action="Payouts">Seller payouts</a>
+        </div>
+
+        @if (TempData["AdminManagementMessage"] != null)
+        {
+            <div class="role-notice">@TempData["AdminManagementMessage"]</div>
+        }
+
+        @if (TempData["AdminManagementError"] != null)
+        {
+            <div class="role-notice admin-management-error">@TempData["AdminManagementError"]</div>
+        }
+
+        <div class="admin-management-layout">
+            <section class="admin-management-panel">
+                <div class="section-heading-small">
+                    <h2>Add a new administrator</h2>
+                    <p>Use a unique account. Your own password is required to authorize the change.</p>
+                </div>
+
+                <form asp-action="CreateAdmin" method="post" class="admin-create-form">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="admin-form-errors"></div>
+
+                    <label>
+                        <span>Full name</span>
+                        <input asp-for="NewAdmin.FullName" autocomplete="name" />
+                        <span asp-validation-for="NewAdmin.FullName" class="field-validation-error"></span>
+                    </label>
+
+                    <label>
+                        <span>Email address</span>
+                        <input asp-for="NewAdmin.Email" type="email" autocomplete="off" />
+                        <span asp-validation-for="NewAdmin.Email" class="field-validation-error"></span>
+                    </label>
+
+                    <label>
+                        <span>Phone number</span>
+                        <input asp-for="NewAdmin.PhoneNumber" inputmode="numeric" maxlength="11" autocomplete="off" />
+                        <span asp-validation-for="NewAdmin.PhoneNumber" class="field-validation-error"></span>
+                    </label>
+
+                    <label>
+                        <span>New admin password</span>
+                        <input asp-for="NewAdmin.Password" type="password" autocomplete="new-password" />
+                        <small>At least 12 characters with uppercase, lowercase, number, and symbol.</small>
+                        <span asp-validation-for="NewAdmin.Password" class="field-validation-error"></span>
+                    </label>
+
+                    <label>
+                        <span>Confirm new password</span>
+                        <input asp-for="NewAdmin.ConfirmPassword" type="password" autocomplete="new-password" />
+                        <span asp-validation-for="NewAdmin.ConfirmPassword" class="field-validation-error"></span>
+                    </label>
+
+                    <label class="admin-current-password">
+                        <span>Your current admin password</span>
+                        <input asp-for="NewAdmin.CurrentPassword" type="password" autocomplete="current-password" />
+                        <span asp-validation-for="NewAdmin.CurrentPassword" class="field-validation-error"></span>
+                    </label>
+
+                    <button type="submit">Create administrator</button>
+                </form>
+            </section>
+
+            <section class="admin-management-panel">
+                <div class="section-heading-small">
+                    <h2>Current administrators</h2>
+                    <p>Removing access keeps the person's account and related records intact.</p>
+                </div>
+
+                <div class="admin-account-list">
+                    @foreach (var admin in Model.Administrators)
+                    {
+                        var isCurrentAdmin = admin.UserId == Model.CurrentAdminId;
+                        <article class="admin-account-card">
+                            <div class="application-avatar">
+                                @admin.FullName.Substring(0, 1).ToUpperInvariant()
+                            </div>
+                            <div class="admin-account-identity">
+                                <strong>@admin.FullName</strong>
+                                <span>@admin.Email</span>
+                                <small>Added @admin.CreatedAt.ToString("dd MMM yyyy")</small>
+                            </div>
+
+                            @if (isCurrentAdmin)
+                            {
+                                <span class="admin-you-badge">You</span>
+                            }
+                            else
+                            {
+                                <details class="admin-remove-control">
+                                    <summary>Remove access</summary>
+                                    <form asp-action="RemoveAdmin" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@admin.UserId" />
+                                        <label>
+                                            <span>Your current password</span>
+                                            <input type="password"
+                                                   name="currentPassword"
+                                                   required
+                                                   autocomplete="current-password" />
+                                        </label>
+                                        <button type="submit"
+                                                onclick="return confirm('Remove this administrator’s access?');">
+                                            Confirm removal
+                                        </button>
+                                    </form>
+                                </details>
+                            }
+                        </article>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

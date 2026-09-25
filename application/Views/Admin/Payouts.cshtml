@@ -1,0 +1,106 @@
+@model GreenMart.Models.AdminPayoutDashboardViewModel
+
+@{
+    ViewData["Title"] = "Seller payouts";
+    var openPayouts = Model.Payouts.Count(x => x.Status != "Completed");
+}
+
+<section class="role-dashboard payout-admin-page">
+    <div class="role-dashboard-shell">
+        <header class="role-dashboard-header">
+            <div>
+                <span class="role-eyebrow">GreenMart administration</span>
+                <h1>Seller payouts</h1>
+                <p>Verify payout destinations, record Cash on Delivery remittances and complete transfers safely.</p>
+            </div>
+            <div class="role-summary-card"><strong>@openPayouts</strong><span>open payouts</span></div>
+        </header>
+
+        @if (TempData["PayoutAdminMessage"] != null)
+        {
+            <div class="role-notice">@TempData["PayoutAdminMessage"]</div>
+        }
+
+        <section class="admin-payout-section">
+            <div class="section-heading-small"><h2>Accounts awaiting verification</h2><p>Confirm the account holder and destination outside GreenMart before approval.</p></div>
+            @if (!Model.PendingAccounts.Any())
+            {
+                <div class="wallet-empty"><strong>No verification requests</strong><span>New or updated seller payout accounts will appear here.</span></div>
+            }
+            else
+            {
+                <div class="admin-payout-list">
+                    @foreach (var account in Model.PendingAccounts)
+                    {
+                        <article class="admin-payout-card">
+                            <div><span>Seller</span><strong>@account.Seller.FullName</strong><small>@account.Seller.Email</small></div>
+                            <div><span>Method</span><strong>@account.Method</strong><small>@account.AccountHolderName</small></div>
+                            <div><span>Destination</span><strong>@account.AccountNumber</strong><small>@(account.BankName ?? "bKash account")</small></div>
+                            <form asp-action="VerifyPayoutAccount" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="accountId" value="@account.SellerPayoutAccountId" />
+                                <button type="submit">Verify account</button>
+                            </form>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+
+        <section class="admin-payout-section">
+            <div class="section-heading-small"><h2>Cash on Delivery remittances</h2><p>Confirm only after GreenMart has actually received the collected cash.</p></div>
+            @if (!Model.CodEarningsAwaitingRemittance.Any())
+            {
+                <div class="wallet-empty"><strong>No COD remittances waiting</strong><span>Delivered COD orders requiring collection will appear here.</span></div>
+            }
+            else
+            {
+                <div class="admin-payout-list">
+                    @foreach (var earning in Model.CodEarningsAwaitingRemittance)
+                    {
+                        <article class="admin-payout-card">
+                            <div><span>Order</span><strong>#@earning.OrderId</strong><small>Delivered @earning.DeliveryAssignment.DeliveredAt?.ToString("dd MMM yyyy")</small></div>
+                            <div><span>Seller</span><strong>@earning.Seller.FullName</strong><small>@earning.Seller.Email</small></div>
+                            <div><span>Expected amount</span><strong>৳@earning.NetAmount.ToString("0.00")</strong><small>Zero GreenMart commission</small></div>
+                            <form asp-action="ConfirmCodRemittance" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="earningId" value="@earning.SellerEarningId" />
+                                <button type="submit">Confirm money received</button>
+                            </form>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+
+        <section class="admin-payout-section">
+            <div class="section-heading-small"><h2>Payout queue and history</h2><p>Until approved B2C API credentials are connected, transfer the amount first and then record its reference.</p></div>
+            @if (!Model.Payouts.Any())
+            {
+                <div class="wallet-empty"><strong>No payouts created</strong><span>A payout is created after the release window and account verification.</span></div>
+            }
+            else
+            {
+                <div class="admin-payout-list">
+                    @foreach (var payout in Model.Payouts)
+                    {
+                        <article class="admin-payout-card">
+                            <div><span>Order and seller</span><strong>#@payout.Earning.OrderId · @payout.Seller.FullName</strong><small>@payout.Provider · @payout.AccountNumberSnapshot</small></div>
+                            <div><span>Amount</span><strong>৳@payout.Amount.ToString("0.00")</strong><small>@payout.Status</small></div>
+                            <div><span>Reference</span><strong>@(payout.ExternalReference ?? "Not paid yet")</strong><small>@payout.RequestedAt.ToString("dd MMM yyyy, h:mm tt")</small></div>
+                            @if (payout.Status != "Completed")
+                            {
+                                <form asp-action="CompleteManualPayout" method="post" class="manual-payout-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="payoutId" value="@payout.SellerPayoutId" />
+                                    <input name="externalReference" maxlength="100" placeholder="Bank or bKash transaction ID" required />
+                                    <button type="submit">Record completed payout</button>
+                                </form>
+                            }
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</section>

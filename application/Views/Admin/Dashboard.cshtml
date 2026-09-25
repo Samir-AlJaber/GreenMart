@@ -20,6 +20,11 @@
             </div>
         </header>
 
+        <div class="admin-dashboard-links">
+            <a asp-controller="Admin" asp-action="Payouts">Manage seller payouts</a>
+            <a asp-controller="Admin" asp-action="Admins">Manage administrators</a>
+        </div>
+
         @if (TempData["AdminMessage"] != null)
         {
             <div class="role-notice">@TempData["AdminMessage"]</div>
