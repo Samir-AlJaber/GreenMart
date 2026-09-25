@@ -2,6 +2,7 @@
 
 <div class="location-picker-modal"
      id="locationPickerModal"
+     data-user-id="@User.FindFirst("UserId")?.Value"
      data-api-key="@Configuration["GoogleMaps:ApiKey"]"
      aria-hidden="true">
     <div class="location-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="locationPickerTitle">
@@ -14,10 +15,13 @@
         </header>
 
         <div class="location-picker-search-row">
-            <input type="search" id="locationPickerSearch" placeholder="Search road, area or landmark" autocomplete="street-address" />
+            <input type="search" id="locationPickerSearch" aria-label="Search for a location" placeholder="Type a road, area or landmark" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="locationPickerSuggestions" />
             <button type="button" id="locationPickerSearchButton">Search</button>
             <button type="button" id="locationPickerCurrentButton" class="location-picker-current">Use my location</button>
         </div>
+
+        <div class="location-picker-suggestions" id="locationPickerSuggestions" role="listbox" aria-label="Matching and recent locations" hidden></div>
+        <p class="location-picker-search-status" id="locationPickerSearchStatus" role="status" aria-live="polite"></p>
 
         <div class="location-picker-map-wrap">
             <div id="locationPickerMap" class="location-picker-map" aria-label="Map for choosing an exact address"></div>
