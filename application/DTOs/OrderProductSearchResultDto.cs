@@ -39,6 +39,10 @@ namespace GreenMart.DTOs
 
         public string OrderStatus { get; set; }
 
+        public string PaymentMethod { get; set; }
+
+        public string PaymentStatus { get; set; }
+
 
         public DateTime OrderDate { get; set; }
 
