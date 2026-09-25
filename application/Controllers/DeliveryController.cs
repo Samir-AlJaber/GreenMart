@@ -1,5 +1,6 @@
 using GreenMart.Data;
 using GreenMart.Models;
+using GreenMart.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +11,15 @@ namespace GreenMart.Controllers
     public class DeliveryController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ISellerPayoutService _sellerPayoutService;
 
-        public DeliveryController(ApplicationDbContext context) => _context = context;
+        public DeliveryController(
+            ApplicationDbContext context,
+            ISellerPayoutService sellerPayoutService)
+        {
+            _context = context;
+            _sellerPayoutService = sellerPayoutService;
+        }
 
         [Authorize(Roles = "DeliveryMan")]
         [HttpGet]
@@ -179,7 +187,10 @@ namespace GreenMart.Controllers
         [Authorize(Roles = "DeliveryMan")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateStatus(int assignmentId, string status)
+        public async Task<IActionResult> UpdateStatus(
+            int assignmentId,
+            string status,
+            CancellationToken cancellationToken)
         {
             if (!TryGetUserId(out var deliveryManId)) return Unauthorized();
 
@@ -224,7 +235,15 @@ namespace GreenMart.Controllers
                 if (application != null) application.IsAvailable = true;
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync(cancellationToken);
+
+            if (nextStatus == "Delivered")
+            {
+                await _sellerPayoutService.CreateEarningForDeliveredAssignmentAsync(
+                    assignment.DeliveryAssignmentId,
+                    cancellationToken);
+            }
+
             TempData["DeliveryMessage"] = $"Delivery marked as {FormatStatus(nextStatus)}.";
             return RedirectToAction(nameof(Dashboard));
         }

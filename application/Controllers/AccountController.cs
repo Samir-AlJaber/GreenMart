@@ -144,6 +144,7 @@ namespace GreenMart.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
         {
 

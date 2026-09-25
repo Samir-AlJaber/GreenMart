@@ -868,6 +868,10 @@ namespace GreenMart.Controllers
                         OrderStatus =
                         x.Order.Status,
 
+                        PaymentMethod = x.Order.PaymentMethod,
+
+                        PaymentStatus = x.Order.PaymentStatus,
+
                         RejectionReason =
                         x.Order.RejectionReason,
 
@@ -910,9 +914,12 @@ namespace GreenMart.Controllers
                 return NotFound();
             }
 
-            if (order.Status == "Rejected")
+            if (order.Status == "Rejected" ||
+                order.Status == "PaymentPending" ||
+                order.Status == "PaymentFailed" ||
+                order.Status == "PaymentCancelled")
             {
-                TempData["OrderMessage"] = "A receipt is not available for a rejected order.";
+                TempData["OrderMessage"] = "A receipt is available only for a placed Cash on Delivery order or a verified online payment.";
                 return RedirectToAction(nameof(MyOrders));
             }
 
@@ -1009,7 +1016,10 @@ namespace GreenMart.Controllers
                     .ThenInclude(x => x.User)
                 .Where(
                     x =>
-                    x.Product.UserId == userId
+                    x.Product.UserId == userId &&
+                    x.Order.Status != "PaymentPending" &&
+                    x.Order.Status != "PaymentFailed" &&
+                    x.Order.Status != "PaymentCancelled"
                 )
                 .Select(
                     x =>
@@ -1070,7 +1080,11 @@ namespace GreenMart.Controllers
 
 
                         OrderStatus =
-                            x.Order.Status,
+                        x.Order.Status,
+
+                        PaymentMethod = x.Order.PaymentMethod,
+
+                        PaymentStatus = x.Order.PaymentStatus,
 
 
                         RejectionReason =
